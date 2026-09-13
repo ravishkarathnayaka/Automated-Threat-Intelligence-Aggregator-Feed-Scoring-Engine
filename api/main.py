@@ -1,11 +1,13 @@
 """FastAPI Application Entry Point for Automated Threat Intelligence Aggregator & Feed Scoring Engine."""
 
 import logging
+import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
 
 from api.routers.exports import router as exports_router
 from api.routers.indicators import router as indicators_router
@@ -63,9 +65,10 @@ app.include_router(indicators_router)
 app.include_router(exports_router)
 
 
-@app.get("/", tags=["Health & Status"])
-async def root() -> JSONResponse:
-    """Root status endpoint with API information and export navigation."""
+@app.get("/api", tags=["Health & Status"])
+@app.get("/api/status", tags=["Health & Status"])
+async def api_status() -> JSONResponse:
+    """API status endpoint with metadata and export navigation."""
     return JSONResponse(
         content={
             "name": "Automated Threat Intelligence Aggregator & Feed Scoring Engine",
@@ -90,3 +93,9 @@ async def root() -> JSONResponse:
 async def health_check() -> JSONResponse:
     """Service health probe."""
     return JSONResponse(content={"status": "healthy", "service": "cti-scoring-engine"})
+
+
+# Mount frontend portal to serve interactive UI at root "/"
+WEB_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "web")
+if os.path.exists(WEB_DIR):
+    app.mount("/", StaticFiles(directory=WEB_DIR, html=True), name="web")

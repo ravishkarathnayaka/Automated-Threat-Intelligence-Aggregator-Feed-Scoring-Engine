@@ -26,6 +26,16 @@ async def test_health_check():
 
 
 @pytest.mark.asyncio
+async def test_root_serves_web_portal():
+    """Verify root endpoint serves the Sentinel CTI web portal HTML."""
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        response = await client.get("/")
+        assert response.status_code == 200
+        assert "text/html" in response.headers.get("content-type", "")
+        assert "SENTINEL CTI" in response.text
+
+
+@pytest.mark.asyncio
 async def test_query_indicators_by_type_and_score():
     """Verify filtering indicators by IP and score threshold."""
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:

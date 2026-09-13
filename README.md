@@ -216,6 +216,38 @@ Where:
 
 ---
 
+### Option 3: Launch Web Portal Frontend Locally
+
+To explore the **Sentinel Cyber-Telemetry Web Portal** on your workstation:
+
+```bash
+# Option A: Python simple HTTP server
+python -m http.server 3000 -d web
+
+# Option B: Node / npx serve
+npx serve web
+```
+Open [http://localhost:3000](http://localhost:3000) in your browser. The portal automatically links to your local FastAPI backend on port 8000 when active, or operates in standalone showcase mode if the API is offline.
+
+---
+
+### Option 4: Deploy Frontend to Vercel ($0 Public Showcase)
+
+The repository includes a root `vercel.json` pre-configured for static deployment on Vercel:
+
+1. **Via Vercel CLI**:
+   ```bash
+   npm i -g vercel
+   vercel
+   ```
+2. **Via GitHub Integration**:
+   - Push this repository to GitHub.
+   - Go to [vercel.com](https://vercel.com) $\rightarrow$ **Add New Project** $\rightarrow$ Import this repository.
+   - Root Directory: `./` (or leave default). Vercel reads `vercel.json` and automatically deploys the `web/` directory.
+   - Click **Deploy**! Visitors can interact with live IoC search, run the scoring math sandbox, inspect STIX 2.1 schemas, and download firewall blocklists immediately.
+
+---
+
 ## 🛡️ Testing & Verification
 
 Run the comprehensive unit and integration test suite:

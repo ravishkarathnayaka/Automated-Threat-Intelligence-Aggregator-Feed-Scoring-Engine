@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SENTINEL CTI | Automated Threat Intelligence & Feed Scoring Engine</title>
+  <meta name="description" content="Production-grade Cyber Threat Intelligence (CTI) Aggregation, Normalization, Confidence Scoring, and Automated Enforcement Hub.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23f59e0b'><path d='M12 2L1 21h22L12 2zm0 3.8L20.1 19H3.9L12 5.8zM11 10v4h2v-4h-2zm0 6v2h2v-2h-2z'/></svg>">
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="#" class="brand-wrapper">
+        <div class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            <circle cx="12" cy="11" r="3"></circle>
+          </svg>
+        </div>
+        <div class="brand-title">
+          SENTINEL CTI
+          <span class="brand-sub">FEED SCORING & ENFORCEMENT ENGINE</span>
+        </div>
+      </a>
+
+      <!-- Center Telemetry: DEFCON & Clock -->
+      <div class="nav-telemetry">
+        <div class="defcon-pill">
+          <div class="defcon-pulse"></div>
+          <span>DEFCON 2 : ELEVATED THREAT</span>
+        </div>
+        <div class="sys-chip font-mono">
+          <span id="utc-clock">--:--:-- UTC</span>
+        </div>
+      </div>
+
+      <!-- Right Action Links -->
+      <div class="nav-links">
+        <div class="sys-chip active font-mono" id="api-status-badge">
+          <span class="status-dot">●</span>
+          <span id="backend-label">PROBING API...</span>
+        </div>
+        <a href="https://github.com/ravishkarathnayaka/Automated-Threat-Intelligence-Aggregator-Feed-Scoring-Engine" target="_blank" class="nav-btn nav-btn-secondary">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          GitHub
+        </a>
+        <a href="#sandbox" class="nav-btn nav-btn-amber" onclick="switchTab('sandbox')">
+          + Score IoC
+        </a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Container -->
+  <main class="main-container">
+    
+    <!-- Hero Header Area -->
+    <header class="hero-header">
+      <div class="hero-title-area">
+        <h1>Autonomous Threat Intelligence Operations</h1>
+        <p>
+          Multi-feed normalization, mathematical confidence-scoring, and automated perimeter firewall and DNS sinkholing rules generated with zero false-positive leakage.
+        </p>
+        <div class="live-badge-row">
+          <span class="sys-chip font-mono">FEED POOL: ABUSEIPDB • URLHAUS • CISA KEV</span>
+          <span class="sys-chip font-mono">STANDARDS: STIX 2.1 • RFC RPZ</span>
+          <span class="sys-chip font-mono">RUNTIME: $0 SERVERLESS COMPLIANT</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Stat Metric Grid -->
+    <section class="stat-grid">
+      <div class="stat-card" style="--card-accent: #06b6d4; --card-glow: rgba(6, 182, 212, 0.25);">
+        <div class="stat-header">
+          <span class="stat-label">Monitored IoCs</span>
+          <div class="stat-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#06b6d4" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+          </div>
+        </div>
+        <div class="stat-value" id="stat-total-iocs">--</div>
+        <div class="stat-footer">
+          <span id="stat-breakdown-badges">Aggregated across 3 open feeds</span>
+        </div>
+      </div>
+
+      <div class="stat-card" style="--card-accent: #ef4444; --card-glow: rgba(239, 68, 68, 0.25);">
+        <div class="stat-header">
+          <span class="stat-label">High-Risk Threats (Score &ge; 70)</span>
+          <div class="stat-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+          </div>
+        </div>
+        <div class="stat-value" id="stat-high-threats">--</div>
+        <div class="stat-footer">
+          <span>Active in inline blocking feeds</span>
+        </div>
+      </div>
+
+      <div class="stat-card" style="--card-accent: #10b981; --card-glow: rgba(16, 185, 129, 0.25);">
+        <div class="stat-header">
+          <span class="stat-label">Suppressed Assets</span>
+          <div class="stat-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><polyline points="9 12 11 14 15 10"></polyline></svg>
+          </div>
+        </div>
+        <div class="stat-value" id="stat-whitelisted">--</div>
+        <div class="stat-footer">
+          <span>RFC 1918 & Cloudflare/Google DNS Safe</span>
+        </div>
+      </div>
+
+      <div class="stat-card" style="--card-accent: #f59e0b; --card-glow: rgba(245, 158, 11, 0.25);">
+        <div class="stat-header">
+          <span class="stat-label">Enforcement Rules</span>
+          <div class="stat-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+          </div>
+        </div>
+        <div class="stat-value" id="stat-enforcement">4 Feeds</div>
+        <div class="stat-footer">
+          <span>iptables • STIX 2.1 • DNS RPZ • Suricata</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Navigation Tabs -->
+    <div class="tabs-bar">
+      <button class="tab-btn active" onclick="switchTab('explorer')" id="tab-btn-explorer">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        Threat Indicators Hub
+        <span class="tab-badge" id="badge-ioc-count">0</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('sandbox')" id="tab-btn-sandbox">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+        IoC Scoring Sandbox
+      </button>
+      <button class="tab-btn" onclick="switchTab('exports')" id="tab-btn-exports">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+        Enforcement Feeds & Rules
+      </button>
+      <button class="tab-btn" onclick="switchTab('architecture')" id="tab-btn-architecture">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+        Scoring Math & Pipeline
+      </button>
+    </div>
+
+    <!-- TAB 1: THREAT INDICATORS HUB -->
+    <div id="panel-explorer" class="tab-panel active">
+      <div class="filter-bar">
+        <div class="filter-group">
+          <div class="search-input-wrapper">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="filter-search" class="cyber-input" placeholder="Search by IP, domain, hash, or CVE..." oninput="applyFilters()">
+          </div>
+
+          <select id="filter-type" class="cyber-select font-mono" onchange="applyFilters()">
+            <option value="all">ALL TYPES</option>
+            <option value="ipv4">IPv4 ADDRESSES</option>
+            <option value="ipv6">IPv6 ADDRESSES</option>
+            <option value="domain">DOMAINS</option>
+            <option value="url">URLs</option>
+            <option value="sha256">SHA-256 HASHES</option>
+            <option value="md5">MD5 HASHES</option>
+            <option value="cve">CVE VULNERABILITIES</option>
+          </select>
+
+          <div class="score-slider-box">
+            <span>MIN SCORE:</span>
+            <input type="range" id="filter-min-score" min="0" max="100" value="0" step="5" oninput="updateScoreFilter(this.value)">
+            <span id="score-slider-val" style="color: var(--amber-primary); font-weight: bold; width: 28px;">0</span>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <button class="nav-btn nav-btn-secondary font-mono" onclick="resetFilters()">Reset</button>
+          <button class="nav-btn nav-btn-amber font-mono" onclick="triggerFeedRefresh()">↻ Sync Feeds</button>
+        </div>
+      </div>
+
+      <!-- Indicators Table -->
+      <div class="table-card">
+        <div class="table-responsive">
+          <table class="ioc-table">
+            <thead>
+              <tr>
+                <th>Indicator Value</th>
+                <th>Type</th>
+                <th>Confidence Score</th>
+                <th>Threat Tier</th>
+                <th>Reporting Feeds</th>
+                <th>Tags</th>
+                <th style="text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="indicators-tbody">
+              <!-- Rendered via JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: IOC SCORING SANDBOX -->
+    <div id="panel-sandbox" class="tab-panel">
+      <div class="sandbox-grid">
+        <div class="panel-card">
+          <h3>⚡ IoC Ingestion & Multi-Factor Scoring Sandbox</h3>
+          <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1.5rem;">
+            Test any raw or defanged indicator (e.g. <code>hxxps://malware[.]site/bin</code>, <code>185[.]220[.]101[.]5</code>, or benign <code>8.8.8.8</code>). Observe automated refanging, false-positive suppression, cross-confirmation multipliers, and exponential time decay.
+          </p>
+
+          <form id="sandbox-form" onsubmit="handleSandboxSubmit(event)">
+            <div class="form-group">
+              <label>Indicator Value (Raw or Defanged)</label>
+              <input type="text" id="sb-input-value" class="cyber-input font-mono" placeholder="e.g. 194[.]26[.]29[.]112 or hxxp://evil[.]cc/gate" required value="194[.]26[.]29[.]112">
+            </div>
+
+            <div class="form-group">
+              <label>Simulated Reporting Feed(s)</label>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; font-size: 0.8rem;" class="font-mono">
+                <label style="display: flex; align-items: center; gap: 0.4rem; color: #fff;">
+                  <input type="checkbox" id="sb-feed-cisa" value="cisa_kev"> CISA KEV (1.00)
+                </label>
+                <label style="display: flex; align-items: center; gap: 0.4rem; color: #fff;">
+                  <input type="checkbox" id="sb-feed-abuse" value="abuseipdb" checked> AbuseIPDB (0.85)
+                </label>
+                <label style="display: flex; align-items: center; gap: 0.4rem; color: #fff;">
+                  <input type="checkbox" id="sb-feed-urlhaus" value="urlhaus" checked> URLhaus (0.85)
+                </label>
+                <label style="display: flex; align-items: center; gap: 0.4rem; color: #fff;">
+                  <input type="checkbox" id="sb-feed-otx" value="otx"> AlienVault OTX (0.75)
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Days Elapsed Since Observation (Decay Testing)</label>
+              <input type="number" id="sb-days-old" class="cyber-input font-mono" value="1" min="0" max="90">
+            </div>
+
+            <div class="form-group">
+              <label>Enrichment Simulated Verdict</label>
+              <select id="sb-enrichment-level" class="cyber-select font-mono" style="width: 100%;">
+                <option value="high">High Positive (VT: 45 engines, OTX: 8 pulses) [+18 pts]</option>
+                <option value="medium">Moderate Positive (VT: 5 engines, OTX: 2 pulses) [+9 pts]</option>
+                <option value="none">Zero Detections / Clean [0 pts]</option>
+              </select>
+            </div>
+
+            <button type="submit" class="nav-btn nav-btn-amber" style="width: 100%; justify-content: center; padding: 0.75rem;">
+              Calculate Real-Time Risk Score
+            </button>
+          </form>
+        </div>
+
+        <div class="panel-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h3>Scoring Engine Breakdown</h3>
+            <span id="sb-result-tier" class="tier-badge tier-low font-mono">STANDBY</span>
+          </div>
+
+          <div id="sb-score-summary" style="margin-bottom: 1.25rem; display: flex; align-items: baseline; gap: 0.75rem;">
+            <div style="font-size: 3rem; font-weight: 800; font-family: 'JetBrains Mono', monospace;" id="sb-score-big">--</div>
+            <div style="color: var(--text-secondary); font-size: 0.85rem;" id="sb-score-comment">Submit an indicator to see calculation telemetry</div>
+          </div>
+
+          <div class="code-display" id="sb-code-breakdown">
+// Step-by-step scoring output will display here:
+// Normalization -> Whitelist -> Reliability -> Multipliers -> Decay -> Score
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 3: ENFORCEMENT FEEDS & EXPORT HUB -->
+    <div id="panel-exports" class="tab-panel">
+      <div class="export-grid">
+
+        <!-- Export 1: Firewall Blocklist -->
+        <div class="export-card">
+          <div>
+            <div class="export-top">
+              <div class="export-title">Firewall IP Blocklist</div>
+              <span class="export-format">firewall.txt</span>
+            </div>
+            <p class="export-desc">
+              Plaintext newline-delimited blocklist of confirmed high-confidence malicious IPs. Formatted for direct automated consumption by iptables, pfSense, Palo Alto EDLs, and Fortinet feeds.
+            </p>
+          </div>
+          <div class="export-actions">
+            <button class="nav-btn nav-btn-secondary" onclick="previewExport('firewall')">View Preview</button>
+            <button class="nav-btn nav-btn-amber" onclick="downloadExport('firewall')">Download .txt</button>
+          </div>
+        </div>
+
+        <!-- Export 2: STIX 2.1 JSON Bundle -->
+        <div class="export-card">
+          <div>
+            <div class="export-top">
+              <div class="export-title">OASIS STIX 2.1 Bundle</div>
+              <span class="export-format">stix.json</span>
+            </div>
+            <p class="export-desc">
+              Standardized STIX 2.1 JSON bundle of scored Indicators, confidence ratings, valid_from timestamps, and external sighting references for enterprise SIEM/SOAR ingestion (Splunk, Elastic, Microsoft Sentinel).
+            </p>
+          </div>
+          <div class="export-actions">
+            <button class="nav-btn nav-btn-secondary" onclick="previewExport('stix')">View Preview</button>
+            <button class="nav-btn nav-btn-amber" onclick="downloadExport('stix')">Download .json</button>
+          </div>
+        </div>
+
+        <!-- Export 3: DNS Response Policy Zone (RPZ) -->
+        <div class="export-card">
+          <div>
+            <div class="export-top">
+              <div class="export-title">DNS Response Policy Zone</div>
+              <span class="export-format">rpz.zone</span>
+            </div>
+            <p class="export-desc">
+              RFC-compliant DNS RPZ zone file generating NXDOMAIN (CNAME .) responses for malicious domains. Compatible with BIND 9, Pi-hole, and Unbound for network-wide DNS sinkholing.
+            </p>
+          </div>
+          <div class="export-actions">
+            <button class="nav-btn nav-btn-secondary" onclick="previewExport('rpz')">View Preview</button>
+            <button class="nav-btn nav-btn-amber" onclick="downloadExport('rpz')">Download .zone</button>
+          </div>
+        </div>
+
+        <!-- Export 4: Suricata IDS/IPS Rules -->
+        <div class="export-card">
+          <div>
+            <div class="export-top">
+              <div class="export-title">Suricata IDS/IPS Rules</div>
+              <span class="export-format">suricata.rules</span>
+            </div>
+            <p class="export-desc">
+              Suricata network inspection rules generating drops and high-severity alerts for outbound C2 connections and malicious TLS Server Name Indication (SNI) handshakes.
+            </p>
+          </div>
+          <div class="export-actions">
+            <button class="nav-btn nav-btn-secondary" onclick="previewExport('suricata')">View Preview</button>
+            <button class="nav-btn nav-btn-amber" onclick="downloadExport('suricata')">Download .rules</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Export Preview Box -->
+      <div class="panel-card" style="margin-top: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+          <h3 id="export-preview-title">Enforcement Feed Output Preview</h3>
+          <button class="nav-btn nav-btn-secondary font-mono" onclick="copyExportPreview()">Copy to Clipboard</button>
+        </div>
+        <div class="code-display" id="export-preview-content">Select "View Preview" above to inspect generated enforcement rules.</div>
+      </div>
+    </div>
+
+    <!-- TAB 4: SCORING ARCHITECTURE & MATH -->
+    <div id="panel-architecture" class="tab-panel">
+      <div class="panel-card" style="margin-bottom: 1.5rem;">
+        <h3 style="margin-bottom: 0.75rem;">Mathematical Scoring Formulation</h3>
+        <p style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 1rem;">
+          The scoring engine balances source authority, multi-source corroboration, and freshness decay to produce an auditable 0–100 confidence score:
+        </p>
+
+        <div class="code-display font-mono" style="margin-bottom: 1.25rem; color: #fbbf24;">
+Score = min(100.0, (Base Weight * Cross-Source Multiplier * (0.95 ^ Days Old)) + Enrichment Boost)
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
+          <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
+            <div style="font-weight: 700; color: #fff; margin-bottom: 0.3rem;">1. Source Weights</div>
+            <div style="font-size: 0.8rem; color: var(--text-secondary);">
+              • CISA KEV: 1.00 (Authoritative)<br>
+              • AbuseIPDB: 0.85 (Crowd consensus)<br>
+              • URLhaus: 0.85 (Malware links)<br>
+              • SOC Analyst Manual: 0.90<br>
+              • Community Feeds: 0.60
+            </div>
+          </div>
+
+          <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
+            <div style="font-weight: 700; color: #fff; margin-bottom: 0.3rem;">2. Cross-Source Multiplier</div>
+            <div style="font-size: 0.8rem; color: var(--text-secondary);">
+              • 1 Feed: 1.00x<br>
+              • 2 Feeds: 1.25x (+25% boost)<br>
+              • 3 Feeds: 1.45x (+45% boost)<br>
+              • 4+ Feeds: 1.60x (+60% boost)
+            </div>
+          </div>
+
+          <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.06);">
+            <div style="font-weight: 700; color: #fff; margin-bottom: 0.3rem;">3. Hard Whitelist Suppression</div>
+            <div style="font-size: 0.8rem; color: var(--text-secondary);">
+              • RFC 1918 Private Subnets<br>
+              • Loopback & Link-Local<br>
+              • Google DNS (8.8.8.8, 8.8.4.4)<br>
+              • Cloudflare (1.1.1.1, 1.0.0.1)<br>
+              • Tranco/Alexa Top 10k Domains<br>
+              <strong>Override Result: Score = 0.0</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Indicator Detail Inspection Modal -->
+  <div class="modal-overlay" id="detail-modal" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeModal(event)">&times;</button>
+      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+        <span class="type-badge" id="modal-type-badge">TYPE</span>
+        <h2 id="modal-title" class="font-mono" style="font-size: 1.3rem; word-break: break-all;">Indicator Value</h2>
+      </div>
+      <div id="modal-status-row" style="margin-bottom: 1.5rem; display: flex; gap: 0.75rem; align-items: center;">
+        <span id="modal-tier-badge" class="tier-badge font-mono">TIER</span>
+        <span id="modal-whitelist-badge" class="sys-chip font-mono">NON-WHITELISTED</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;" class="font-mono">
+        <div style="background: rgba(0,0,0,0.3); padding: 0.75rem; border-radius: 8px;">
+          <div style="font-size: 0.7rem; color: var(--text-muted);">FIRST SEEN</div>
+          <div id="modal-first-seen" style="font-size: 0.85rem; color: #fff;">--</div>
+        </div>
+        <div style="background: rgba(0,0,0,0.3); padding: 0.75rem; border-radius: 8px;">
+          <div style="font-size: 0.7rem; color: var(--text-muted);">LAST SEEN</div>
+          <div id="modal-last-seen" style="font-size: 0.85rem; color: #fff;">--</div>
+        </div>
+      </div>
+
+      <h4 style="margin-bottom: 0.5rem; color: #fff;">Reporting Sources & Telemetry</h4>
+      <div id="modal-sources-list" style="margin-bottom: 1.25rem;"></div>
+
+      <h4 style="margin-bottom: 0.5rem; color: #fff;">STIX 2.1 Pattern Representation</h4>
+      <div class="code-display font-mono" id="modal-stix-pattern" style="margin-bottom: 1rem;"></div>
+
+      <h4 style="margin-bottom: 0.5rem; color: #fff;">Full JSON Telemetry</h4>
+      <div class="code-display" id="modal-json-dump"></div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div>
+        <strong>SENTINEL Threat Intelligence Aggregator & Feed Scoring Engine</strong> • MIT License
+      </div>
+      <div>
+        Deployable locally via Docker Compose or serverless via Vercel
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

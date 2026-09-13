@@ -2,6 +2,9 @@
   "version": 2,
   "cleanUrls": true,
   "outputDirectory": "web",
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/index.py" }
+  ],
   "headers": [
     {
       "source": "/(.*)",

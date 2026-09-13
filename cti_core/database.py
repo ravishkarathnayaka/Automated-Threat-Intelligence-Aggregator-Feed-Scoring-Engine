@@ -7,8 +7,11 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 
 from cti_core.models.indicator import Base
 
-# Default to local SQLite for $0 standalone setup; override with PostgreSQL via DATABASE_URL in docker
-RAW_DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./cti_engine.db")
+# Handle Vercel serverless read-only filesystem by redirecting SQLite to /tmp
+if os.getenv("VERCEL") and not os.getenv("DATABASE_URL"):
+    RAW_DATABASE_URL = "sqlite+aiosqlite:////tmp/cti_engine.db"
+else:
+    RAW_DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./cti_engine.db")
 
 # Normalize DB URL for async drivers
 if RAW_DATABASE_URL.startswith("sqlite:///"):

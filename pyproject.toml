@@ -23,6 +23,11 @@ dependencies = [
     "python-dotenv>=1.0.1",
 ]
 
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["cti_core*", "api*"]
+exclude = ["tests*", "docker*", "web*"]
+
 [tool.pytest.ini_options]
 minversion = "7.0"
 addopts = "-ra -q --import-mode=importlib"

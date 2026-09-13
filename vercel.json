@@ -3,7 +3,10 @@
   "cleanUrls": true,
   "outputDirectory": "web",
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/index.py" }
+    { "source": "/api/(.*)", "destination": "/api/index.py?__vercel_path__=/api/$1" },
+    { "source": "/docs", "destination": "/api/index.py?__vercel_path__=/docs" },
+    { "source": "/redoc", "destination": "/api/index.py?__vercel_path__=/redoc" },
+    { "source": "/openapi.json", "destination": "/api/index.py?__vercel_path__=/openapi.json" }
   ],
   "headers": [
     {

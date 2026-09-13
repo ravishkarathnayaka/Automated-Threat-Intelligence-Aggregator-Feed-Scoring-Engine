@@ -39,14 +39,32 @@ AsyncSessionLocal = async_sessionmaker(
 )
 
 
+_db_initialized = False
+
+
 async def init_db() -> None:
     """Create database tables if they do not already exist."""
     async with async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
 
 
+async def ensure_db_initialized() -> None:
+    """Lazy database initializer guaranteeing tables and seeds exist before any query."""
+    global _db_initialized
+    if not _db_initialized:
+        await init_db()
+        try:
+            from cti_core.pipeline import seed_mock_data_if_empty
+            async with AsyncSessionLocal() as session:
+                await seed_mock_data_if_empty(session)
+        except Exception:
+            pass
+        _db_initialized = True
+
+
 async def get_db_session() -> AsyncGenerator[AsyncSession, None]:
     """FastAPI dependency for obtaining an isolated async database session."""
+    await ensure_db_initialized()
     async with AsyncSessionLocal() as session:
         try:
             yield session

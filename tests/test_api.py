@@ -101,3 +101,38 @@ async def test_dns_rpz_export():
         assert response.status_code == 200
         assert "CNAME ." in response.text
         assert "SOA" in response.text
+
+
+@pytest.mark.asyncio
+async def test_portal_static_assets():
+    """Verify explicit routes for styles.css and app.js."""
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        css_res = await client.get("/styles.css")
+        assert css_res.status_code == 200
+        assert "text/css" in css_res.headers.get("content-type", "")
+
+        js_res = await client.get("/app.js")
+        assert js_res.status_code == 200
+        assert "javascript" in js_res.headers.get("content-type", "")
+
+
+@pytest.mark.asyncio
+async def test_vercel_path_normalizer():
+    """Verify Vercel ASGI path normalizer correctly routes simulated rewrites."""
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        # Simulate Vercel rewrite with __vercel_path__
+        response = await client.get("/api/index.py?__vercel_path__=/api/v1/indicators&type=ip")
+        assert response.status_code == 200
+        data = response.json()
+        assert isinstance(data, list)
+
+        # Simulate Vercel status rewrite
+        status_res = await client.get("/api/index.py?__vercel_path__=/api/status")
+        assert status_res.status_code == 200
+        assert status_res.json()["status"] == "online"
+
+        # Simulate Vercel health rewrite
+        health_res = await client.get("/api/index.py?__vercel_path__=/api/v1/health")
+        assert health_res.status_code == 200
+        assert health_res.json()["status"] == "healthy"
+

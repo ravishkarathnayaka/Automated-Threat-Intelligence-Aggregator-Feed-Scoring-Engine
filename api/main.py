@@ -11,6 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
+from api.middleware.security import APIKeyAuthMiddleware, RateLimiterMiddleware
 from api.routers.exports import router as exports_router
 from api.routers.indicators import router as indicators_router
 from cti_core.database import AsyncSessionLocal, ensure_db_initialized, init_db
@@ -99,6 +100,10 @@ app = FastAPI(
 
 # Install Vercel path normalizer ASGI middleware
 app.add_middleware(VercelPathNormalizerMiddleware)
+
+# Install Rate Limiter and Auth Middlewares
+app.add_middleware(RateLimiterMiddleware, max_requests_per_minute=300)
+app.add_middleware(APIKeyAuthMiddleware)
 
 # CORS configuration
 app.add_middleware(

@@ -10,6 +10,7 @@ from cti_core.exporters.dns_rpz_exporter import DNSRPZExporter
 from cti_core.exporters.firewall_blocklist import FirewallBlocklistExporter
 from cti_core.exporters.rules_exporter import RulesExporter
 from cti_core.exporters.stix_exporter import STIXExporter
+from cti_core.exporters.zeek_exporter import ZeekIntelExporter
 from cti_core.models.indicator import IndicatorModel
 
 router = APIRouter(prefix="/api/v1/export", tags=["Feed Exports"])
@@ -166,3 +167,34 @@ async def export_snort_rules(
         media_type="text/plain; charset=utf-8",
         headers={"Content-Disposition": 'inline; filename="snort.rules"'},
     )
+
+
+@router.get(
+    "/zeek.intel",
+    response_class=Response,
+    summary="Export Zeek (Bro) Intelligence Feed",
+    description="Zeek Intelligence Framework tab-delimited intel file for network security monitoring.",
+)
+async def export_zeek_intel(
+    min_score: float = Query(70.0, ge=0.0, le=100.0, description="Minimum confidence score threshold"),
+    session: AsyncSession = Depends(get_db_session),
+) -> Response:
+    """Stream Zeek Intelligence Framework table."""
+    stmt = (
+        select(IndicatorModel)
+        .where(
+            IndicatorModel.is_whitelisted.is_(False),
+            IndicatorModel.confidence_score >= min_score,
+        )
+        .order_by(IndicatorModel.confidence_score.desc())
+    )
+    result = await session.execute(stmt)
+    indicators = result.scalars().all()
+
+    intel_text = ZeekIntelExporter.export_intel(indicators, min_score=min_score)
+    return Response(
+        content=intel_text,
+        media_type="text/plain; charset=utf-8",
+        headers={"Content-Disposition": 'inline; filename="zeek.intel"'},
+    )
+

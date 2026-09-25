@@ -190,6 +190,7 @@ async def api_status(request: Request) -> JSONResponse:
                 "export_dns_rpz": "/api/v1/export/dns-rpz.zone",
                 "export_suricata": "/api/v1/export/suricata.rules",
                 "export_snort": "/api/v1/export/snort.rules",
+                "export_zeek": "/api/v1/export/zeek.intel",
                 "trigger_pipeline": "/api/v1/pipeline/run",
             },
         }

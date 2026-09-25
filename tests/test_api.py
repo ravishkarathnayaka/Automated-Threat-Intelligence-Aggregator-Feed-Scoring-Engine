@@ -104,6 +104,17 @@ async def test_dns_rpz_export():
 
 
 @pytest.mark.asyncio
+async def test_zeek_intel_api_export():
+    """Verify Zeek intelligence table export endpoint."""
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        response = await client.get("/api/v1/export/zeek.intel?min_score=50")
+        assert response.status_code == 200
+        assert "Intel::ADDR" in response.text or "Intel::" in response.text
+        assert "#fields" in response.text
+
+
+
+@pytest.mark.asyncio
 async def test_portal_static_assets():
     """Verify explicit routes for styles.css and app.js."""
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:

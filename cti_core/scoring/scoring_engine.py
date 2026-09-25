@@ -11,6 +11,7 @@ SOURCE_RELIABILITY_WEIGHTS: Dict[str, float] = {
     "cisa_kev": 1.00,       # CISA Known Exploited Vulnerabilities (authoritative)
     "urlhaus": 0.85,        # Abuse.ch URLhaus malware link
     "abuseipdb": 0.85,      # AbuseIPDB crowd-reported high confidence
+    "feodo_tracker": 0.90,  # Abuse.ch Feodo Tracker botnet C2
     "virustotal": 0.80,     # VirusTotal multi-engine consensus
     "otx": 0.75,            # AlienVault OTX pulses
     "threatfox": 0.85,      # Abuse.ch ThreatFox
@@ -110,6 +111,10 @@ class ScoringEngine:
                     enrichment_boost += 8.0
                 elif pulses >= 1:
                     enrichment_boost += 4.0
+
+            # Bulletproof ASN or high-risk malicious infrastructure modifier
+            if enrichment_data.get("is_bulletproof_asn") or enrichment_data.get("high_risk_hosting"):
+                enrichment_boost += 10.0
 
         # Base mathematical calculation
         base_points = max_weight * 70.0  # Base scale out of 70

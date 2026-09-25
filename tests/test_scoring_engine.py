@@ -93,3 +93,25 @@ def test_whitelist_hard_override_to_zero():
     assert result.is_whitelisted is True
     assert result.tier == ConfidenceTier.LOW
     assert "Google" in (result.whitelist_reason or "")
+
+
+def test_feodo_tracker_scoring_and_asn_penalty():
+    """Verify Feodo Tracker C2 source weight and ASN risk boost."""
+    engine = ScoringEngine()
+    now = datetime.now(timezone.utc)
+    sources = [{"source_name": "feodo_tracker"}]
+
+    base_score = engine.calculate_score("ipv4", "185.244.150.84", sources, last_seen=now)
+    assert base_score.source_weight == 0.90
+
+    # With bulletproof ASN flag
+    asn_boosted = engine.calculate_score(
+        "ipv4",
+        "185.244.150.84",
+        sources,
+        last_seen=now,
+        enrichment_data={"is_bulletproof_asn": True},
+    )
+    assert asn_boosted.enrichment_boost == 10.0
+    assert asn_boosted.final_score > base_score.final_score
+

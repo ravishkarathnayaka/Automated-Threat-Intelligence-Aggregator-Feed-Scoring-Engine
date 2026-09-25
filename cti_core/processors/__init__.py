@@ -1,3 +1,4 @@
+from cti_core.processors.cidr_filter import CIDRFilter
 from cti_core.processors.deduplicator import Deduplicator
 from cti_core.processors.normalizer import (
     defang,
@@ -14,4 +15,5 @@ __all__ = [
     "normalize_indicator",
     "Deduplicator",
     "WhitelistFilter",
+    "CIDRFilter",
 ]

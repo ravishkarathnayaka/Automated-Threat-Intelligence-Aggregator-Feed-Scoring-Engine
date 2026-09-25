@@ -103,9 +103,14 @@ def main(args: Optional[List[str]] = None) -> int:
         return 0
 
     elif parsed.command == "export":
+        import asyncio
+        from cti_core.pipeline import CTIPipeline
+
         fmt = parsed.format
         min_s = parsed.min_score
-        items = get_synthetic_indicators()
+        raw_items = get_synthetic_indicators()
+        pipeline = CTIPipeline()
+        items = asyncio.run(pipeline.process_and_score(raw_items, skip_enrichment=True))
 
         if fmt == "firewall":
             print(FirewallBlocklistExporter.export_plaintext(items, min_score=min_s))

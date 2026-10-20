@@ -8,12 +8,14 @@ from cti_core.collectors.sslbl import SSLBLCollector
 from cti_core.collectors.threatfox import ThreatFoxCollector
 from cti_core.collectors.tor_nodes import TorExitNodesCollector
 from cti_core.collectors.urlhaus import URLhausCollector
+from cti_core.collectors.urlscan import URLScanCollector
 
 __all__ = [
     "BaseCollector",
     "AbuseIPDBCollector",
     "BlocklistDeCollector",
     "URLhausCollector",
+    "URLScanCollector",
     "CISAKEVCollector",
     "FeodoTrackerCollector",
     "OpenPhishCollector",

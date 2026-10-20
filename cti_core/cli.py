@@ -52,6 +52,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
     export_p.add_argument("--min-score", type=float, default=70.0, help="Minimum score threshold")
 
+    # Command: stats
+    subparsers.add_parser("stats", help="Compute summary statistics for offline synthetic dataset")
+
     return parser
 
 
@@ -124,6 +127,31 @@ def main(args: Optional[List[str]] = None) -> int:
             print(RulesExporter.export_snort(items, min_score=min_s))
         elif fmt == "zeek":
             print(ZeekIntelExporter.export_intel(items, min_score=min_s))
+        return 0
+
+    elif parsed.command == "stats":
+        import asyncio
+        from cti_core.pipeline import CTIPipeline
+
+        raw_items = get_synthetic_indicators()
+        pipeline = CTIPipeline()
+        items = asyncio.run(pipeline.process_and_score(raw_items, skip_enrichment=True))
+
+        total = len(items)
+        whitelisted = sum(1 for i in items if i.get("is_whitelisted"))
+        active = total - whitelisted
+        types: dict = {}
+        for i in items:
+            t = i.get("type", "unknown")
+            types[t] = types.get(t, 0) + 1
+
+        stats_output = {
+            "total_indicators": total,
+            "whitelisted": whitelisted,
+            "active_threats": active,
+            "type_breakdown": types,
+        }
+        print(json.dumps(stats_output, indent=2))
         return 0
 
     return 0

@@ -3,6 +3,7 @@ from cti_core.collectors.base import BaseCollector
 from cti_core.collectors.cisa_kev import CISAKEVCollector
 from cti_core.collectors.feodo_tracker import FeodoTrackerCollector
 from cti_core.collectors.threatfox import ThreatFoxCollector
+from cti_core.collectors.tor_nodes import TorExitNodesCollector
 from cti_core.collectors.urlhaus import URLhausCollector
 
 __all__ = [
@@ -12,4 +13,5 @@ __all__ = [
     "CISAKEVCollector",
     "FeodoTrackerCollector",
     "ThreatFoxCollector",
+    "TorExitNodesCollector",
 ]

@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from cti_core.database import get_db_session
 from cti_core.exporters.checkpoint_exporter import CheckPointExporter
+from cti_core.exporters.cloudflare_exporter import CloudflareWAFExporter
 from cti_core.exporters.dns_rpz_exporter import DNSRPZExporter
 from cti_core.exporters.firewall_blocklist import FirewallBlocklistExporter
 from cti_core.exporters.fortinet_exporter import FortinetExporter
@@ -259,6 +260,38 @@ async def export_fortinet_feed(
         media_type="text/plain; charset=utf-8",
         headers={"Content-Disposition": 'inline; filename="fortinet_feed.txt"'},
     )
+
+
+@router.get(
+    "/cloudflare.json",
+    response_class=Response,
+    summary="Export Cloudflare WAF IP Access Rules",
+    description="Cloudflare API JSON payload for automated IP access rule creation and WAF blocking.",
+)
+async def export_cloudflare_rules(
+    min_score: float = Query(80.0, ge=0.0, le=100.0, description="Minimum confidence score threshold"),
+    session: AsyncSession = Depends(get_db_session),
+) -> Response:
+    """Stream Cloudflare WAF IP access rules JSON array."""
+    stmt = (
+        select(IndicatorModel)
+        .where(
+            IndicatorModel.type.in_(["ipv4", "ipv6"]),
+            IndicatorModel.is_whitelisted.is_(False),
+            IndicatorModel.confidence_score >= min_score,
+        )
+        .order_by(IndicatorModel.confidence_score.desc())
+    )
+    result = await session.execute(stmt)
+    indicators = result.scalars().all()
+
+    content = CloudflareWAFExporter.export_json(indicators, min_score=min_score)
+    return Response(
+        content=content,
+        media_type="application/json; charset=utf-8",
+        headers={"Content-Disposition": 'inline; filename="cloudflare_waf_rules.json"'},
+    )
+
 
 
 

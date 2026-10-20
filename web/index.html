@@ -399,6 +399,57 @@
           </div>
         </div>
 
+        <!-- Export 8: MISP Threat Sharing Package -->
+        <div class="export-card">
+          <div>
+            <div class="export-top">
+              <div class="export-title">MISP Threat Sharing Event</div>
+              <span class="export-format">misp.json</span>
+            </div>
+            <p class="export-desc">
+              Malware Information Sharing Platform (MISP) standardized JSON event with mapped attributes for community intel exchanges.
+            </p>
+          </div>
+          <div class="export-actions">
+            <button class="nav-btn nav-btn-secondary" onclick="previewExport('misp')">View Preview</button>
+            <button class="nav-btn nav-btn-amber" onclick="downloadExport('misp')">Download .json</button>
+          </div>
+        </div>
+
+        <!-- Export 9: YARA Malicious Hash Ruleset -->
+        <div class="export-card">
+          <div>
+            <div class="export-top">
+              <div class="export-title">YARA Hash Ruleset</div>
+              <span class="export-format">yara.yar</span>
+            </div>
+            <p class="export-desc">
+              Compiled YARA condition rules for endpoint forensics and file scanning targeting detected cryptographic hashes.
+            </p>
+          </div>
+          <div class="export-actions">
+            <button class="nav-btn nav-btn-secondary" onclick="previewExport('yara')">View Preview</button>
+            <button class="nav-btn nav-btn-amber" onclick="downloadExport('yara')">Download .yar</button>
+          </div>
+        </div>
+
+        <!-- Export 10: Tabular CSV / TSV Threat Report -->
+        <div class="export-card">
+          <div>
+            <div class="export-top">
+              <div class="export-title">CSV Threat Report</div>
+              <span class="export-format">indicators.csv</span>
+            </div>
+            <p class="export-desc">
+              Tabular spreadsheet threat summary compatible with Splunk lookup tables, Microsoft Excel, and custom SIEM ingestors.
+            </p>
+          </div>
+          <div class="export-actions">
+            <button class="nav-btn nav-btn-secondary" onclick="previewExport('csv')">View Preview</button>
+            <button class="nav-btn nav-btn-amber" onclick="downloadExport('csv')">Download .csv</button>
+          </div>
+        </div>
+
       </div>
 
       <!-- Export Preview Box -->

@@ -10,6 +10,12 @@ from cti_core.models.indicator import (
     ScoreBreakdown,
     SeverityLevel,
 )
+from cti_core.models.sighting import (
+    SightingCreate,
+    SightingModel,
+    SightingRead,
+    SightingType,
+)
 from cti_core.models.stix_schema import STIXBundle, STIXIndicator
 
 __all__ = [
@@ -23,6 +29,10 @@ __all__ = [
     "ScoreBreakdown",
     "IndicatorModel",
     "IndicatorSourceModel",
+    "SightingModel",
+    "SightingCreate",
+    "SightingRead",
+    "SightingType",
     "STIXIndicator",
     "STIXBundle",
 ]

@@ -9,6 +9,7 @@ from cti_core.database import get_db_session
 from cti_core.exporters.checkpoint_exporter import CheckPointExporter
 from cti_core.exporters.dns_rpz_exporter import DNSRPZExporter
 from cti_core.exporters.firewall_blocklist import FirewallBlocklistExporter
+from cti_core.exporters.fortinet_exporter import FortinetExporter
 from cti_core.exporters.rules_exporter import RulesExporter
 from cti_core.exporters.stix_exporter import STIXExporter
 from cti_core.exporters.zeek_exporter import ZeekIntelExporter
@@ -228,5 +229,36 @@ async def export_checkpoint_feed(
         media_type="text/plain; charset=utf-8",
         headers={"Content-Disposition": 'inline; filename="checkpoint_feed.txt"'},
     )
+
+
+@router.get(
+    "/fortinet.txt",
+    response_class=Response,
+    summary="Export Fortinet FortiGate External Threat Feed",
+    description="Fortinet FortiOS threat feed format for external blocklist fabric connector.",
+)
+async def export_fortinet_feed(
+    min_score: float = Query(70.0, ge=0.0, le=100.0, description="Minimum confidence score threshold"),
+    session: AsyncSession = Depends(get_db_session),
+) -> Response:
+    """Stream Fortinet FortiGate external threat feed."""
+    stmt = (
+        select(IndicatorModel)
+        .where(
+            IndicatorModel.is_whitelisted.is_(False),
+            IndicatorModel.confidence_score >= min_score,
+        )
+        .order_by(IndicatorModel.confidence_score.desc())
+    )
+    result = await session.execute(stmt)
+    indicators = result.scalars().all()
+
+    content = FortinetExporter.export(indicators, min_score=min_score)
+    return Response(
+        content=content,
+        media_type="text/plain; charset=utf-8",
+        headers={"Content-Disposition": 'inline; filename="fortinet_feed.txt"'},
+    )
+
 
 

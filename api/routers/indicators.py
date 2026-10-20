@@ -162,6 +162,47 @@ async def create_indicator(
     return model_to_read_schema(record)
 
 
+@router.post(
+    "/indicators/bulk",
+    response_model=Dict[str, Any],
+    status_code=status.HTTP_201_CREATED,
+    summary="Bulk Ingest Indicators",
+    description="Batch submit multiple IoCs for automated normalization, deduplication, scoring, and storage.",
+)
+async def create_indicators_bulk(
+    payload: List[IndicatorCreate],
+    session: AsyncSession = Depends(get_db_session),
+) -> Dict[str, Any]:
+    """Ingest, normalize, enrich, score, and persist multiple indicators in a single batch."""
+    if not payload:
+        raise HTTPException(status_code=400, detail="Payload list cannot be empty.")
+
+    raw_dicts = [
+        {
+            "value": item.value,
+            "type": item.type.value if item.type else None,
+            "source": item.source_name,
+            "severity": item.severity.value,
+            "tags": item.tags,
+            "reference_url": item.reference_url,
+            "reported_at": item.reported_at.isoformat() if item.reported_at else None,
+        }
+        for item in payload
+    ]
+
+    pipeline = CTIPipeline()
+    processed = await pipeline.process_and_score(raw_dicts)
+    if processed:
+        await pipeline.persist_to_database(session, processed)
+
+    return {
+        "status": "success",
+        "submitted": len(payload),
+        "processed": len(processed),
+        "message": f"Successfully processed and scored {len(processed)} indicators.",
+    }
+
+
 @router.get(
     "/indicators/{value:path}",
     response_model=IndicatorRead,

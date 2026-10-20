@@ -1,5 +1,6 @@
 from cti_core.exporters.checkpoint_exporter import CheckPointExporter
 from cti_core.exporters.cloudflare_exporter import CloudflareWAFExporter
+from cti_core.exporters.csv_exporter import CSVExporter
 from cti_core.exporters.dns_rpz_exporter import DNSRPZExporter
 from cti_core.exporters.firewall_blocklist import FirewallBlocklistExporter
 from cti_core.exporters.fortinet_exporter import FortinetExporter
@@ -13,6 +14,7 @@ from cti_core.exporters.zeek_exporter import ZeekIntelExporter
 __all__ = [
     "CheckPointExporter",
     "CloudflareWAFExporter",
+    "CSVExporter",
     "STIXExporter",
     "FirewallBlocklistExporter",
     "FortinetExporter",

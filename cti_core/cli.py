@@ -55,6 +55,11 @@ def build_parser() -> argparse.ArgumentParser:
     # Command: stats
     subparsers.add_parser("stats", help="Compute summary statistics for offline synthetic dataset")
 
+    # Command: bulk-score
+    bulk_p = subparsers.add_parser("bulk-score", help="Batch score a comma-separated list of indicators")
+    bulk_p.add_argument("indicators", type=str, help="Comma-separated indicator strings")
+    bulk_p.add_argument("--source", type=str, default="analyst_bulk", help="Source tag")
+
     return parser
 
 
@@ -152,6 +157,27 @@ def main(args: Optional[List[str]] = None) -> int:
             "type_breakdown": types,
         }
         print(json.dumps(stats_output, indent=2))
+        return 0
+
+    elif parsed.command == "bulk-score":
+        raw_list = [x.strip() for x in parsed.indicators.split(",") if x.strip()]
+        results = []
+        for val in raw_list:
+            clean = refang(val)
+            ioc_type_enum, norm = identify_indicator_type(clean)
+            breakdown = global_scoring_engine.calculate_score(
+                ioc_type_enum.value,
+                norm,
+                [{"source_name": parsed.source}],
+            )
+            results.append({
+                "indicator": clean,
+                "type": ioc_type_enum.value,
+                "score": breakdown.final_score,
+                "tier": breakdown.tier.value,
+                "whitelisted": breakdown.is_whitelisted,
+            })
+        print(json.dumps(results, indent=2))
         return 0
 
     return 0

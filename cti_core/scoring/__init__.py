@@ -1,3 +1,4 @@
+from cti_core.scoring.decay_models import HalfLifeDecayModel
 from cti_core.scoring.scoring_engine import (
     DECAY_LAMBDA,
     SOURCE_RELIABILITY_WEIGHTS,
@@ -8,6 +9,7 @@ from cti_core.scoring.scoring_engine import (
 __all__ = [
     "ScoringEngine",
     "global_scoring_engine",
+    "HalfLifeDecayModel",
     "SOURCE_RELIABILITY_WEIGHTS",
     "DECAY_LAMBDA",
 ]

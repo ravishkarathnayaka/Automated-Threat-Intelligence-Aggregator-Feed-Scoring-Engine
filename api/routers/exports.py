@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from cti_core.database import get_db_session
 from cti_core.exporters.checkpoint_exporter import CheckPointExporter
 from cti_core.exporters.cloudflare_exporter import CloudflareWAFExporter
+from cti_core.exporters.csv_exporter import CSVExporter
 from cti_core.exporters.dns_rpz_exporter import DNSRPZExporter
 from cti_core.exporters.firewall_blocklist import FirewallBlocklistExporter
 from cti_core.exporters.fortinet_exporter import FortinetExporter
@@ -355,6 +356,41 @@ async def export_yara_rules(
         media_type="text/plain; charset=utf-8",
         headers={"Content-Disposition": 'inline; filename="sentinel_hashes.yar"'},
     )
+
+
+@router.get(
+    "/indicators.csv",
+    response_class=Response,
+    summary="Export Indicators CSV / TSV Report",
+    description="Standard tabular CSV or TSV threat export for spreadsheet analysis, Splunk lookup tables, and SIEMs.",
+)
+async def export_indicators_csv(
+    min_score: float = Query(0.0, ge=0.0, le=100.0, description="Minimum confidence score threshold"),
+    delimiter: str = Query(",", description="Delimiter character (',' or '\t')"),
+    exclude_whitelisted: bool = Query(True, description="Filter out whitelisted indicators"),
+    session: AsyncSession = Depends(get_db_session),
+) -> Response:
+    """Stream CSV/TSV indicator table."""
+    stmt = (
+        select(IndicatorModel)
+        .where(IndicatorModel.confidence_score >= min_score)
+        .order_by(IndicatorModel.confidence_score.desc())
+    )
+    result = await session.execute(stmt)
+    indicators = result.scalars().all()
+
+    csv_data = CSVExporter.export(
+        indicators,
+        delimiter=delimiter,
+        min_score=min_score,
+        exclude_whitelisted=exclude_whitelisted,
+    )
+    return Response(
+        content=csv_data,
+        media_type="text/csv; charset=utf-8",
+        headers={"Content-Disposition": 'inline; filename="indicators_export.csv"'},
+    )
+
 
 
 

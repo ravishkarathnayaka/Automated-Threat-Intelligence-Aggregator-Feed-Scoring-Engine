@@ -1,5 +1,6 @@
 from cti_core.processors.cidr_filter import CIDRFilter
 from cti_core.processors.deduplicator import Deduplicator
+from cti_core.processors.hash_validator import HashValidator
 from cti_core.processors.normalizer import (
     defang,
     identify_indicator_type,
@@ -18,4 +19,5 @@ __all__ = [
     "WhitelistFilter",
     "CIDRFilter",
     "PunycodeProcessor",
+    "HashValidator",
 ]

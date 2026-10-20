@@ -13,6 +13,7 @@ from cti_core.exporters.zeek_exporter import ZeekIntelExporter
 from cti_core.mock_data import get_synthetic_indicators
 from cti_core.processors.cidr_filter import CIDRFilter
 from cti_core.processors.normalizer import defang, identify_indicator_type, refang
+from cti_core.processors.punycode import PunycodeProcessor
 from cti_core.scoring.scoring_engine import global_scoring_engine
 
 
@@ -59,6 +60,10 @@ def build_parser() -> argparse.ArgumentParser:
     bulk_p = subparsers.add_parser("bulk-score", help="Batch score a comma-separated list of indicators")
     bulk_p.add_argument("indicators", type=str, help="Comma-separated indicator strings")
     bulk_p.add_argument("--source", type=str, default="analyst_bulk", help="Source tag")
+
+    # Command: check-domain
+    domain_p = subparsers.add_parser("check-domain", help="Analyze domain for Punycode homograph attacks")
+    domain_p.add_argument("domain", type=str, help="Domain string (e.g. xn--pple-43d.com or apple.com)")
 
     return parser
 
@@ -178,6 +183,21 @@ def main(args: Optional[List[str]] = None) -> int:
                 "whitelisted": breakdown.is_whitelisted,
             })
         print(json.dumps(results, indent=2))
+        return 0
+
+    elif parsed.command == "check-domain":
+        dom = parsed.domain.strip()
+        is_puny = PunycodeProcessor.is_punycode(dom)
+        decoded = PunycodeProcessor.decode_punycode(dom)
+        homograph = PunycodeProcessor.detect_homograph(decoded)
+        analysis = {
+            "input_domain": dom,
+            "is_punycode": is_puny,
+            "decoded_unicode": decoded,
+            "has_homograph_spoof": homograph.get("is_spoof", False),
+            "script_breakdown": homograph.get("scripts", []),
+        }
+        print(json.dumps(analysis, indent=2))
         return 0
 
     return 0

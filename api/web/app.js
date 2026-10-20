@@ -658,6 +658,61 @@ function generateExportContent(format) {
     return lines.join("\n");
   }
 
+  if (format === "checkpoint") {
+    const ips = highIocs.filter(i => i.type === "ipv4" || i.type === "ipv6").map(i => i.normalized_value);
+    return `# Check Point External Network Feed\n# Action: Drop\n` + ips.map(ip => `${ip};drop;Confidence:high`).join("\n");
+  }
+
+  if (format === "fortinet") {
+    const ips = highIocs.filter(i => i.type === "ipv4" || i.type === "ipv6").map(i => i.normalized_value);
+    return `# Fortinet FortiGate External Threat Feed\n` + ips.join("\n");
+  }
+
+  if (format === "cloudflare") {
+    const ips = highIocs.filter(i => i.type === "ipv4" || i.type === "ipv6");
+    const rules = ips.map(i => ({
+      mode: "block",
+      configuration: { target: i.type === "ipv6" ? "ip6" : "ip", value: i.normalized_value },
+      notes: `Sentinel CTI Auto-Block (Score: ${i.confidence_score})`
+    }));
+    return JSON.stringify(rules, null, 2);
+  }
+
+  if (format === "misp") {
+    const attrs = highIocs.map(i => ({
+      type: i.type === "domain" ? "domain" : (i.type === "url" ? "url" : (i.type.includes("sha") ? "sha256" : "ip-dst")),
+      value: i.normalized_value,
+      to_ids: true,
+      comment: `Score: ${i.confidence_score}`
+    }));
+    const event = {
+      Event: {
+        info: "SENTINEL-CTI High Confidence Threat Feed",
+        threat_level_id: "1",
+        published: true,
+        Attribute: attrs
+      }
+    };
+    return JSON.stringify(event, null, 2);
+  }
+
+  if (format === "yara") {
+    const hashes = highIocs.filter(i => i.type.includes("sha") || i.type === "md5");
+    if (hashes.length === 0) {
+      return `/* No active hashes detected above threshold */\nrule Sentinel_Malware_Hashes {\n    condition:\n        false\n}`;
+    }
+    const conds = hashes.map(h => `        hash.sha256(0, filesize) == "${h.normalized_value}"`);
+    return `import "hash"\n\nrule Sentinel_Malware_Hashes {\n    meta:\n        author = "Sentinel CTI Aggregator"\n        count = ${hashes.length}\n    condition:\n` + conds.join(" or\n") + `\n}`;
+  }
+
+  if (format === "csv") {
+    const rows = ["indicator,type,confidence_score,severity,tags"];
+    highIocs.forEach(i => {
+      rows.push(`"${i.normalized_value}","${i.type}",${i.confidence_score},"${i.severity}","${(i.tags || []).join(';')}"`);
+    });
+    return rows.join("\n");
+  }
+
   return "";
 }
 
@@ -669,7 +724,20 @@ function previewExport(format) {
 
 function downloadExport(format) {
   const content = generateExportContent(format);
-  const ext = format === "stix" ? "json" : (format === "rpz" ? "zone" : (format === "suricata" ? "rules" : "txt"));
+  const extMap = {
+    stix: "json",
+    cloudflare: "json",
+    misp: "json",
+    rpz: "zone",
+    suricata: "rules",
+    snort: "rules",
+    yara: "yar",
+    csv: "csv",
+    checkpoint: "txt",
+    fortinet: "txt",
+    firewall: "txt"
+  };
+  const ext = extMap[format] || "txt";
   const filename = `threat_intel_${format}.${ext}`;
   const blob = new Blob([content], { type: "text/plain;charset=utf-8" });
   const url = URL.createObjectURL(blob);

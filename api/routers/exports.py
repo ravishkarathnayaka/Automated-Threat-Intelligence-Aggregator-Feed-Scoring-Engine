@@ -15,6 +15,7 @@ from cti_core.exporters.fortinet_exporter import FortinetExporter
 from cti_core.exporters.misp_exporter import MISPExporter
 from cti_core.exporters.rules_exporter import RulesExporter
 from cti_core.exporters.stix_exporter import STIXExporter
+from cti_core.exporters.yara_exporter import YARAExporter
 from cti_core.exporters.zeek_exporter import ZeekIntelExporter
 from cti_core.models.indicator import IndicatorModel
 
@@ -323,6 +324,38 @@ async def export_misp_event(
         media_type="application/json; charset=utf-8",
         headers={"Content-Disposition": 'inline; filename="misp_event.json"'},
     )
+
+
+@router.get(
+    "/yara.yar",
+    response_class=Response,
+    summary="Export YARA File Hash Detection Rules",
+    description="Generated YARA ruleset detecting identified cryptographic file hashes (SHA256, MD5, SHA1).",
+)
+async def export_yara_rules(
+    min_score: float = Query(75.0, ge=0.0, le=100.0, description="Minimum confidence score threshold"),
+    session: AsyncSession = Depends(get_db_session),
+) -> Response:
+    """Stream YARA rule definition file."""
+    stmt = (
+        select(IndicatorModel)
+        .where(
+            IndicatorModel.type.in_(["sha256", "sha1", "md5"]),
+            IndicatorModel.is_whitelisted.is_(False),
+            IndicatorModel.confidence_score >= min_score,
+        )
+        .order_by(IndicatorModel.confidence_score.desc())
+    )
+    result = await session.execute(stmt)
+    indicators = result.scalars().all()
+
+    rules = YARAExporter.export_rules(indicators, min_score=min_score)
+    return Response(
+        content=rules,
+        media_type="text/plain; charset=utf-8",
+        headers={"Content-Disposition": 'inline; filename="sentinel_hashes.yar"'},
+    )
+
 
 
 

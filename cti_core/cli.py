@@ -7,8 +7,10 @@ from typing import List, Optional
 
 from cti_core.exporters.dns_rpz_exporter import DNSRPZExporter
 from cti_core.exporters.firewall_blocklist import FirewallBlocklistExporter
+from cti_core.exporters.misp_exporter import MISPExporter
 from cti_core.exporters.rules_exporter import RulesExporter
 from cti_core.exporters.stix_exporter import STIXExporter
+from cti_core.exporters.yara_exporter import YARAExporter
 from cti_core.exporters.zeek_exporter import ZeekIntelExporter
 from cti_core.mock_data import get_synthetic_indicators
 from cti_core.processors.cidr_filter import CIDRFilter
@@ -47,7 +49,7 @@ def build_parser() -> argparse.ArgumentParser:
     export_p = subparsers.add_parser("export", help="Export synthetic/mock feed indicators into enforcement formats")
     export_p.add_argument(
         "--format",
-        choices=["firewall", "stix", "rpz", "suricata", "snort", "zeek"],
+        choices=["firewall", "stix", "rpz", "suricata", "snort", "zeek", "misp", "yara"],
         default="firewall",
         help="Export format target",
     )
@@ -146,6 +148,10 @@ def main(args: Optional[List[str]] = None) -> int:
             print(RulesExporter.export_snort(items, min_score=min_s))
         elif fmt == "zeek":
             print(ZeekIntelExporter.export_intel(items, min_score=min_s))
+        elif fmt == "misp":
+            print(json.dumps(MISPExporter.export_event(items, min_score=min_s), indent=2))
+        elif fmt == "yara":
+            print(YARAExporter.export_rules(items, min_score=min_s))
         return 0
 
     elif parsed.command == "stats":

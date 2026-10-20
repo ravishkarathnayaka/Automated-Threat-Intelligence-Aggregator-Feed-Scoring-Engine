@@ -1,6 +1,7 @@
 from cti_core.processors.cidr_filter import CIDRFilter
 from cti_core.processors.deduplicator import Deduplicator
 from cti_core.processors.dga_detector import DGADetector
+from cti_core.processors.geo_reputation import GeoReputationProcessor
 from cti_core.processors.hash_validator import HashValidator
 from cti_core.processors.ipv6_normalizer import IPv6Normalizer
 from cti_core.processors.mitre_mapper import MitreMapper
@@ -22,6 +23,7 @@ __all__ = [
     "normalize_indicator",
     "Deduplicator",
     "DGADetector",
+    "GeoReputationProcessor",
     "WhitelistFilter",
     "CIDRFilter",
     "PunycodeProcessor",

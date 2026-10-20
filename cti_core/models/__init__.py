@@ -1,4 +1,5 @@
 from cti_core.models.attribution import Campaign, MotivationType, ThreatActor
+from cti_core.models.audit import AuditLogModel, AuditLogRecord
 from cti_core.models.indicator import (
     ConfidenceTier,
     IndicatorBase,
@@ -37,6 +38,8 @@ __all__ = [
     "ThreatActor",
     "Campaign",
     "MotivationType",
+    "AuditLogModel",
+    "AuditLogRecord",
     "STIXIndicator",
     "STIXBundle",
 ]

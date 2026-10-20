@@ -10,6 +10,7 @@ from cti_core.processors.normalizer import (
     refang,
 )
 from cti_core.processors.punycode import PunycodeProcessor
+from cti_core.processors.url_sanitizer import URLSanitizer
 from cti_core.processors.whitelist_filter import WhitelistFilter
 
 __all__ = [
@@ -21,6 +22,7 @@ __all__ = [
     "WhitelistFilter",
     "CIDRFilter",
     "PunycodeProcessor",
+    "URLSanitizer",
     "HashValidator",
     "IPv6Normalizer",
     "MitreMapper",

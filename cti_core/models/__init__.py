@@ -1,3 +1,4 @@
+from cti_core.models.attribution import Campaign, MotivationType, ThreatActor
 from cti_core.models.indicator import (
     ConfidenceTier,
     IndicatorBase,
@@ -33,6 +34,9 @@ __all__ = [
     "SightingCreate",
     "SightingRead",
     "SightingType",
+    "ThreatActor",
+    "Campaign",
+    "MotivationType",
     "STIXIndicator",
     "STIXBundle",
 ]

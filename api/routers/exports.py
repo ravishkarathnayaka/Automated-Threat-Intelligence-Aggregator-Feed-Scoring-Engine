@@ -6,6 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from cti_core.database import get_db_session
+from cti_core.exporters.checkpoint_exporter import CheckPointExporter
 from cti_core.exporters.dns_rpz_exporter import DNSRPZExporter
 from cti_core.exporters.firewall_blocklist import FirewallBlocklistExporter
 from cti_core.exporters.rules_exporter import RulesExporter
@@ -197,4 +198,35 @@ async def export_zeek_intel(
         media_type="text/plain; charset=utf-8",
         headers={"Content-Disposition": 'inline; filename="zeek.intel"'},
     )
+
+
+@router.get(
+    "/checkpoint.txt",
+    response_class=Response,
+    summary="Export Check Point Custom Intelligence Feed",
+    description="Check Point Security Gateway external feed blocklist formatted with drop actions.",
+)
+async def export_checkpoint_feed(
+    min_score: float = Query(70.0, ge=0.0, le=100.0, description="Minimum confidence score threshold"),
+    session: AsyncSession = Depends(get_db_session),
+) -> Response:
+    """Stream Check Point Security Gateway formatted feed."""
+    stmt = (
+        select(IndicatorModel)
+        .where(
+            IndicatorModel.is_whitelisted.is_(False),
+            IndicatorModel.confidence_score >= min_score,
+        )
+        .order_by(IndicatorModel.confidence_score.desc())
+    )
+    result = await session.execute(stmt)
+    indicators = result.scalars().all()
+
+    content = CheckPointExporter.export(indicators, min_score=min_score)
+    return Response(
+        content=content,
+        media_type="text/plain; charset=utf-8",
+        headers={"Content-Disposition": 'inline; filename="checkpoint_feed.txt"'},
+    )
+
 

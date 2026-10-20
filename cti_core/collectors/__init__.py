@@ -1,5 +1,6 @@
 from cti_core.collectors.abuseipdb import AbuseIPDBCollector
 from cti_core.collectors.base import BaseCollector
+from cti_core.collectors.blocklist_de import BlocklistDeCollector
 from cti_core.collectors.cisa_kev import CISAKEVCollector
 from cti_core.collectors.feodo_tracker import FeodoTrackerCollector
 from cti_core.collectors.openphish import OpenPhishCollector
@@ -11,6 +12,7 @@ from cti_core.collectors.urlhaus import URLhausCollector
 __all__ = [
     "BaseCollector",
     "AbuseIPDBCollector",
+    "BlocklistDeCollector",
     "URLhausCollector",
     "CISAKEVCollector",
     "FeodoTrackerCollector",

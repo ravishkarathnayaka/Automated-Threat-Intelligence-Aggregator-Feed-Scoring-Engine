@@ -2,6 +2,7 @@ from cti_core.processors.cidr_filter import CIDRFilter
 from cti_core.processors.deduplicator import Deduplicator
 from cti_core.processors.hash_validator import HashValidator
 from cti_core.processors.ipv6_normalizer import IPv6Normalizer
+from cti_core.processors.mitre_mapper import MitreMapper
 from cti_core.processors.normalizer import (
     defang,
     identify_indicator_type,
@@ -22,4 +23,5 @@ __all__ = [
     "PunycodeProcessor",
     "HashValidator",
     "IPv6Normalizer",
+    "MitreMapper",
 ]

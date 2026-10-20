@@ -1,5 +1,6 @@
 """FastAPI router for exporting enforcement feeds (Firewall blocklist, STIX 2.1, DNS RPZ, Snort/Suricata)."""
 
+import json
 
 from fastapi import APIRouter, Depends, Query, Response
 from sqlalchemy import select
@@ -11,6 +12,7 @@ from cti_core.exporters.cloudflare_exporter import CloudflareWAFExporter
 from cti_core.exporters.dns_rpz_exporter import DNSRPZExporter
 from cti_core.exporters.firewall_blocklist import FirewallBlocklistExporter
 from cti_core.exporters.fortinet_exporter import FortinetExporter
+from cti_core.exporters.misp_exporter import MISPExporter
 from cti_core.exporters.rules_exporter import RulesExporter
 from cti_core.exporters.stix_exporter import STIXExporter
 from cti_core.exporters.zeek_exporter import ZeekIntelExporter
@@ -291,6 +293,37 @@ async def export_cloudflare_rules(
         media_type="application/json; charset=utf-8",
         headers={"Content-Disposition": 'inline; filename="cloudflare_waf_rules.json"'},
     )
+
+
+@router.get(
+    "/misp.json",
+    response_class=Response,
+    summary="Export MISP Event JSON Package",
+    description="Standard MISP format event containing mapped IoC attributes for threat sharing communities.",
+)
+async def export_misp_event(
+    min_score: float = Query(70.0, ge=0.0, le=100.0, description="Minimum confidence score threshold"),
+    session: AsyncSession = Depends(get_db_session),
+) -> Response:
+    """Stream MISP Event JSON bundle."""
+    stmt = (
+        select(IndicatorModel)
+        .where(
+            IndicatorModel.is_whitelisted.is_(False),
+            IndicatorModel.confidence_score >= min_score,
+        )
+        .order_by(IndicatorModel.confidence_score.desc())
+    )
+    result = await session.execute(stmt)
+    indicators = result.scalars().all()
+
+    misp_payload = MISPExporter.export_event(indicators, min_score=min_score)
+    return Response(
+        content=json.dumps(misp_payload, indent=2),
+        media_type="application/json; charset=utf-8",
+        headers={"Content-Disposition": 'inline; filename="misp_event.json"'},
+    )
+
 
 
 

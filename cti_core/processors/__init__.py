@@ -13,6 +13,7 @@ from cti_core.processors.normalizer import (
 )
 from cti_core.processors.punycode import PunycodeProcessor
 from cti_core.processors.tld_reputation import TLDReputationProcessor
+from cti_core.processors.tls_fingerprint import TLSFingerprintValidator
 from cti_core.processors.url_sanitizer import URLSanitizer
 from cti_core.processors.whitelist_filter import WhitelistFilter
 
@@ -28,6 +29,7 @@ __all__ = [
     "CIDRFilter",
     "PunycodeProcessor",
     "TLDReputationProcessor",
+    "TLSFingerprintValidator",
     "URLSanitizer",
     "HashValidator",
     "IPv6Normalizer",

@@ -14,6 +14,7 @@ from cti_core.exporters.yara_exporter import YARAExporter
 from cti_core.exporters.zeek_exporter import ZeekIntelExporter
 from cti_core.mock_data import get_synthetic_indicators
 from cti_core.processors.cidr_filter import CIDRFilter
+from cti_core.processors.dga_detector import DGADetector
 from cti_core.processors.normalizer import defang, identify_indicator_type, refang
 from cti_core.processors.punycode import PunycodeProcessor
 from cti_core.scoring.scoring_engine import global_scoring_engine
@@ -75,6 +76,10 @@ def build_parser() -> argparse.ArgumentParser:
         default="mock",
         help="Collector to test",
     )
+
+    # Command: entropy
+    entropy_p = subparsers.add_parser("entropy", help="Calculate Shannon entropy and DGA score for a domain")
+    entropy_p.add_argument("domain", type=str, help="Domain string to evaluate")
 
     return parser
 
@@ -224,6 +229,18 @@ def main(args: Optional[List[str]] = None) -> int:
         else:
             print(f"[INFO] Initializing collector module for '{c_name}'...")
             print(f"[SUCCESS] Collector '{c_name}' configuration validated successfully.")
+        return 0
+
+    elif parsed.command == "entropy":
+        dom = parsed.domain.strip()
+        is_dga, ent_score, reason = DGADetector.evaluate(dom)
+        result = {
+            "domain": dom,
+            "shannon_entropy": ent_score,
+            "is_dga_suspect": is_dga,
+            "classification": reason,
+        }
+        print(json.dumps(result, indent=2))
         return 0
 
     return 0

@@ -6,6 +6,7 @@ from cti_core.processors.normalizer import (
     normalize_indicator,
     refang,
 )
+from cti_core.processors.punycode import PunycodeProcessor
 from cti_core.processors.whitelist_filter import WhitelistFilter
 
 __all__ = [
@@ -16,4 +17,5 @@ __all__ = [
     "Deduplicator",
     "WhitelistFilter",
     "CIDRFilter",
+    "PunycodeProcessor",
 ]

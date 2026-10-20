@@ -202,15 +202,15 @@ def main(args: Optional[List[str]] = None) -> int:
 
     elif parsed.command == "check-domain":
         dom = parsed.domain.strip()
-        is_puny = PunycodeProcessor.is_punycode(dom)
-        decoded = PunycodeProcessor.decode_punycode(dom)
-        homograph = PunycodeProcessor.detect_homograph(decoded)
+        is_puny = "xn--" in dom.lower()
+        decoded = PunycodeProcessor.to_unicode(dom)
+        is_homograph, explanation = PunycodeProcessor.detect_homograph(decoded)
         analysis = {
             "input_domain": dom,
             "is_punycode": is_puny,
             "decoded_unicode": decoded,
-            "has_homograph_spoof": homograph.get("is_spoof", False),
-            "script_breakdown": homograph.get("scripts", []),
+            "has_homograph_spoof": is_homograph,
+            "explanation": explanation,
         }
         print(json.dumps(analysis, indent=2))
         return 0

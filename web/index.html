@@ -348,6 +348,57 @@
           </div>
         </div>
 
+        <!-- Export 5: Check Point Security Gateway Feed -->
+        <div class="export-card">
+          <div>
+            <div class="export-top">
+              <div class="export-title">Check Point Custom Feed</div>
+              <span class="export-format">checkpoint.txt</span>
+            </div>
+            <p class="export-desc">
+              Check Point External Network Feed formatted with drop actions and confidence comments for inline perimeter enforcement.
+            </p>
+          </div>
+          <div class="export-actions">
+            <button class="nav-btn nav-btn-secondary" onclick="previewExport('checkpoint')">View Preview</button>
+            <button class="nav-btn nav-btn-amber" onclick="downloadExport('checkpoint')">Download .txt</button>
+          </div>
+        </div>
+
+        <!-- Export 6: Fortinet FortiGate External Feed -->
+        <div class="export-card">
+          <div>
+            <div class="export-top">
+              <div class="export-title">Fortinet FortiGate Feed</div>
+              <span class="export-format">fortinet.txt</span>
+            </div>
+            <p class="export-desc">
+              Fortinet FortiOS external threat feed connector format for automated firewall blocklist synchronization.
+            </p>
+          </div>
+          <div class="export-actions">
+            <button class="nav-btn nav-btn-secondary" onclick="previewExport('fortinet')">View Preview</button>
+            <button class="nav-btn nav-btn-amber" onclick="downloadExport('fortinet')">Download .txt</button>
+          </div>
+        </div>
+
+        <!-- Export 7: Cloudflare WAF Access Rules -->
+        <div class="export-card">
+          <div>
+            <div class="export-top">
+              <div class="export-title">Cloudflare WAF Rules</div>
+              <span class="export-format">cloudflare.json</span>
+            </div>
+            <p class="export-desc">
+              JSON payload formatted for the Cloudflare API to deploy edge IP access rules and block malicious traffic at the CDN tier.
+            </p>
+          </div>
+          <div class="export-actions">
+            <button class="nav-btn nav-btn-secondary" onclick="previewExport('cloudflare')">View Preview</button>
+            <button class="nav-btn nav-btn-amber" onclick="downloadExport('cloudflare')">Download .json</button>
+          </div>
+        </div>
+
       </div>
 
       <!-- Export Preview Box -->

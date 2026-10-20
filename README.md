@@ -408,6 +408,62 @@ curl -X POST "http://localhost:8000/api/v1/indicators" \
      }'
 ```
 
+### 7. Extended SIEM, WAF & Forensics Feeds
+Export threat intelligence in specialized vendor formats:
+
+```bash
+# Check Point Security Gateway formatted feed
+curl -X GET "http://localhost:8000/api/v1/export/checkpoint.txt?min_score=70"
+
+# Fortinet FortiGate External Threat Feed
+curl -X GET "http://localhost:8000/api/v1/export/fortinet.txt?min_score=70"
+
+# Cloudflare WAF IP Access Rules JSON
+curl -X GET "http://localhost:8000/api/v1/export/cloudflare.json?min_score=80"
+
+# MISP Standard Threat Sharing Package
+curl -X GET "http://localhost:8000/api/v1/export/misp.json?min_score=70"
+
+# YARA Malicious Hash Detection Ruleset
+curl -X GET "http://localhost:8000/api/v1/export/yara.yar?min_score=75"
+
+# Tabular CSV / TSV Report
+curl -X GET "http://localhost:8000/api/v1/export/indicators.csv?min_score=50"
+
+# High-Level Engine Telemetry & Stats
+curl -X GET "http://localhost:8000/api/v1/stats"
+```
+
+---
+
+## 🛠️ CLI Operations (`cti-cli`)
+
+The repository includes a dedicated command-line utility for offline threat investigation and automation:
+
+```bash
+# Compute composite confidence score for an IoC
+python -m cti_core.cli score 185[.]220[.]101[.]5 --source abuseipdb
+
+# Verify Bogon / RFC 1918 suppression
+python -m cti_core.cli bogon 10.0.0.1
+
+# Refang defanged indicators
+python -m cti_core.cli refang "hxxps://evil-c2[.]cc/beacon"
+
+# Inspect dataset metrics
+python -m cti_core.cli stats
+
+# Batch score multiple IoCs
+python -m cti_core.cli bulk-score "198.51.100.1,malicious.biz,e3b0c442..."
+
+# Analyze domain for IDN / Punycode homograph attacks
+python -m cti_core.cli check-domain xn--pple-43d.com
+
+# Export enforcement feeds directly to stdout
+python -m cti_core.cli export --format yara --min-score 75
+python -m cti_core.cli export --format misp --min-score 70
+```
+
 ---
 
 ## 📄 License

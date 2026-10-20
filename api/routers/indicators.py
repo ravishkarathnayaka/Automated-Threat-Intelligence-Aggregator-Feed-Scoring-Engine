@@ -3,7 +3,7 @@
 from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from cti_core.database import get_db_session
@@ -200,6 +200,51 @@ async def create_indicators_bulk(
         "submitted": len(payload),
         "processed": len(processed),
         "message": f"Successfully processed and scored {len(processed)} indicators.",
+    }
+
+
+@router.get(
+    "/stats",
+    summary="Get Indicator Database Statistics",
+    description="Aggregate metrics on stored indicators including tier distribution, type breakdown, and whitelist counts.",
+)
+async def get_indicator_stats(
+    session: AsyncSession = Depends(get_db_session),
+) -> Dict[str, Any]:
+    """Return high-level operational statistics for SOC dashboard."""
+    # Total count
+    total_res = await session.execute(select(func.count(IndicatorModel.id)))
+    total_count = total_res.scalar() or 0
+
+    # Whitelisted count
+    wl_res = await session.execute(
+        select(func.count(IndicatorModel.id)).where(IndicatorModel.is_whitelisted.is_(True))
+    )
+    whitelisted_count = wl_res.scalar() or 0
+
+    # Type breakdown
+    type_res = await session.execute(
+        select(IndicatorModel.type, func.count(IndicatorModel.id)).group_by(IndicatorModel.type)
+    )
+    type_counts = {str(row[0]): int(row[1]) for row in type_res.all()}
+
+    # Average confidence score
+    avg_res = await session.execute(select(func.avg(IndicatorModel.confidence_score)))
+    avg_score = avg_res.scalar() or 0.0
+
+    # Severity distribution
+    sev_res = await session.execute(
+        select(IndicatorModel.severity, func.count(IndicatorModel.id)).group_by(IndicatorModel.severity)
+    )
+    severity_counts = {str(row[0]): int(row[1]) for row in sev_res.all()}
+
+    return {
+        "total_indicators": total_count,
+        "whitelisted_indicators": whitelisted_count,
+        "active_threat_indicators": total_count - whitelisted_count,
+        "average_confidence_score": round(float(avg_score), 2),
+        "indicators_by_type": type_counts,
+        "indicators_by_severity": severity_counts,
     }
 
 

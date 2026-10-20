@@ -7,6 +7,7 @@ from cti_core.scoring.scoring_engine import (
     ScoringEngine,
     global_scoring_engine,
 )
+from cti_core.scoring.tenant_profiles import TenantProfile, TenantProfileManager
 
 __all__ = [
     "ScoringEngine",
@@ -14,6 +15,8 @@ __all__ = [
     "ConsensusScorer",
     "HalfLifeDecayModel",
     "HysteresisTierEvaluator",
+    "TenantProfile",
+    "TenantProfileManager",
     "SOURCE_RELIABILITY_WEIGHTS",
     "DECAY_LAMBDA",
 ]

@@ -86,6 +86,10 @@ def build_parser() -> argparse.ArgumentParser:
     asn_p = subparsers.add_parser("asn", help="Evaluate Autonomous System Number (ASN) risk reputation")
     asn_p.add_argument("asn", type=str, help="ASN identifier (e.g. AS200019, AS16509, 44477)")
 
+    # Command: dga-check
+    dga_p = subparsers.add_parser("dga-check", help="Batch lexical and entropy analysis for algorithmically generated domains")
+    dga_p.add_argument("domains", type=str, help="Comma-separated domains to evaluate")
+
     return parser
 
 
@@ -257,6 +261,20 @@ def main(args: Optional[List[str]] = None) -> int:
             "is_bulletproof": "bulletproof" in desc.lower(),
         }
         print(json.dumps(out, indent=2))
+        return 0
+
+    elif parsed.command == "dga-check":
+        dom_list = [d.strip() for d in parsed.domains.split(",") if d.strip()]
+        batch_out = []
+        for d in dom_list:
+            is_dga, ent, reason = DGADetector.evaluate(d)
+            batch_out.append({
+                "domain": d,
+                "shannon_entropy": ent,
+                "is_dga_suspect": is_dga,
+                "classification": reason,
+            })
+        print(json.dumps(batch_out, indent=2))
         return 0
 
     return 0

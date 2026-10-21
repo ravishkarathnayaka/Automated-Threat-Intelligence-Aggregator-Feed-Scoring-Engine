@@ -3,6 +3,7 @@ from cti_core.exporters.cloudflare_exporter import CloudflareWAFExporter
 from cti_core.exporters.crowdstrike_exporter import CrowdStrikeExporter
 from cti_core.exporters.csv_exporter import CSVExporter
 from cti_core.exporters.dns_rpz_exporter import DNSRPZExporter
+from cti_core.exporters.elastic_exporter import ElasticExporter
 from cti_core.exporters.firewall_blocklist import FirewallBlocklistExporter
 from cti_core.exporters.fortinet_exporter import FortinetExporter
 from cti_core.exporters.microsoft_sentinel_exporter import MicrosoftSentinelExporter
@@ -25,6 +26,7 @@ __all__ = [
     "FortinetExporter",
     "MicrosoftSentinelExporter",
     "DNSRPZExporter",
+    "ElasticExporter",
     "MISPExporter",
     "RulesExporter",
     "SentinelOneExporter",

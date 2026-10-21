@@ -14,6 +14,7 @@ from cti_core.exporters.misp_exporter import MISPExporter
 from cti_core.exporters.pan_os_exporter import PanOSExporter
 from cti_core.exporters.qradar_exporter import QRadarExporter
 from cti_core.exporters.rules_exporter import RulesExporter
+from cti_core.exporters.sigma_exporter import SigmaExporter
 from cti_core.exporters.sentinelone_exporter import SentinelOneExporter
 from cti_core.exporters.stix_exporter import STIXExporter
 from cti_core.exporters.suricata_eve_exporter import SuricataEVEExporter
@@ -37,6 +38,7 @@ __all__ = [
     "ElasticExporter",
     "MISPExporter",
     "RulesExporter",
+    "SigmaExporter",
     "SentinelOneExporter",
     "SuricataEVEExporter",
     "WazuhExporter",

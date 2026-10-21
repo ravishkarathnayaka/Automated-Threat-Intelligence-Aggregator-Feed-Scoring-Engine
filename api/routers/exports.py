@@ -17,6 +17,7 @@ from cti_core.exporters.fortinet_exporter import FortinetExporter
 from cti_core.exporters.misp_exporter import MISPExporter
 from cti_core.exporters.rules_exporter import RulesExporter
 from cti_core.exporters.stix_exporter import STIXExporter
+from cti_core.exporters.wazuh_exporter import WazuhExporter
 from cti_core.exporters.yara_exporter import YARAExporter
 from cti_core.exporters.zeek_exporter import ZeekIntelExporter
 from cti_core.models.indicator import IndicatorModel
@@ -422,6 +423,37 @@ async def export_elastic_ndjson(
         media_type="application/x-ndjson; charset=utf-8",
         headers={"Content-Disposition": f'inline; filename="{index_name}.ndjson"'},
     )
+
+
+@router.get(
+    "/wazuh.cdb",
+    response_class=Response,
+    summary="Export Wazuh SIEM CDB Threat List",
+    description="Wazuh constant database (CDB) list format (key:value) for instant rule engine lookups.",
+)
+async def export_wazuh_cdb(
+    min_score: float = Query(70.0, ge=0.0, le=100.0, description="Minimum confidence score threshold"),
+    session: AsyncSession = Depends(get_db_session),
+) -> Response:
+    """Stream Wazuh SIEM CDB list."""
+    stmt = (
+        select(IndicatorModel)
+        .where(
+            IndicatorModel.is_whitelisted.is_(False),
+            IndicatorModel.confidence_score >= min_score,
+        )
+        .order_by(IndicatorModel.confidence_score.desc())
+    )
+    result = await session.execute(stmt)
+    indicators = result.scalars().all()
+
+    content = WazuhExporter.export_cdb_list(indicators, min_score=min_score)
+    return Response(
+        content=content,
+        media_type="text/plain; charset=utf-8",
+        headers={"Content-Disposition": 'inline; filename="sentinel_threats.cdb"'},
+    )
+
 
 
 

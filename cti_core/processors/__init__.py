@@ -1,3 +1,4 @@
+from cti_core.processors.asn_lookup import ASNReputationProcessor
 from cti_core.processors.cidr_filter import CIDRFilter
 from cti_core.processors.deduplicator import Deduplicator
 from cti_core.processors.dga_detector import DGADetector
@@ -22,6 +23,7 @@ __all__ = [
     "defang",
     "identify_indicator_type",
     "normalize_indicator",
+    "ASNReputationProcessor",
     "Deduplicator",
     "DGADetector",
     "GeoReputationProcessor",

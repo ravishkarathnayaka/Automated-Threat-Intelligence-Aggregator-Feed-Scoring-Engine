@@ -23,12 +23,26 @@ from cti_core.scoring.bayesian_scorer import BayesianScorer
 from cti_core.scoring.scoring_engine import global_scoring_engine
 
 
+BANNER = r"""
+======================================================================
+  ____  _____ _   _ _____ ___ _   _ _____ _          ____ _____ ___ 
+ / ___|| ____| \ | |_   _|_ _| \ | | ____| |        / ___|_   _|_ _|
+ \___ \|  _| |  \| | | |  | ||  \| |  _| | |       | |     | |  | | 
+  ___) | |___| |\  | | |  | || |\  | |___| |___ ___| |___  | |  | | 
+ |____/|_____|_| \_| |_| |___|_| \_|_____|_____|_____\____| |_| |___|
+ Automated Threat Intelligence Aggregator & Feed Scoring Engine v2.4.0
+======================================================================
+"""
+
+
 def build_parser() -> argparse.ArgumentParser:
     """Build argument parser for CTI engine CLI commands."""
     parser = argparse.ArgumentParser(
         prog="cti-cli",
         description="SENTINEL CTI - Threat Intelligence & Feed Scoring Engine CLI Utility",
     )
+    parser.add_argument("--version", action="version", version="SENTINEL CTI Engine v2.4.0")
+    parser.add_argument("--banner", action="store_true", help="Print ASCII header banner")
     subparsers = parser.add_subparsers(dest="command", help="Available subcommands")
 
     # Command: score
@@ -111,7 +125,12 @@ def main(args: Optional[List[str]] = None) -> int:
     parser = build_parser()
     parsed = parser.parse_args(args)
 
+    if parsed.banner:
+        print(BANNER)
+
     if not parsed.command:
+        if not parsed.banner:
+            print(BANNER)
         parser.print_help()
         return 0
 

@@ -13,6 +13,7 @@ from cti_core.processors.normalizer import (
     refang,
 )
 from cti_core.processors.punycode import PunycodeProcessor
+from cti_core.processors.ssdeep_comparator import SSDeepComparator
 from cti_core.processors.subdomain_flattener import SubdomainFlattener
 from cti_core.processors.tld_reputation import TLDReputationProcessor
 from cti_core.processors.tls_fingerprint import TLSFingerprintValidator
@@ -31,6 +32,7 @@ __all__ = [
     "WhitelistFilter",
     "CIDRFilter",
     "PunycodeProcessor",
+    "SSDeepComparator",
     "SubdomainFlattener",
     "TLDReputationProcessor",
     "TLSFingerprintValidator",

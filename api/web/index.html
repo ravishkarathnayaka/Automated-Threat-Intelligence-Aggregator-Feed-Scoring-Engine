@@ -450,6 +450,74 @@
           </div>
         </div>
 
+        <!-- Export 11: Elasticsearch / OpenSearch NDJSON -->
+        <div class="export-card">
+          <div>
+            <div class="export-top">
+              <div class="export-title">Elasticsearch Bulk NDJSON</div>
+              <span class="export-format">elastic.ndjson</span>
+            </div>
+            <p class="export-desc">
+              Elastic Common Schema (ECS) formatted newline-delimited JSON for direct Elasticsearch / OpenSearch bulk API ingestion.
+            </p>
+          </div>
+          <div class="export-actions">
+            <button class="nav-btn nav-btn-secondary" onclick="previewExport('elastic')">View Preview</button>
+            <button class="nav-btn nav-btn-amber" onclick="downloadExport('elastic')">Download .ndjson</button>
+          </div>
+        </div>
+
+        <!-- Export 12: Wazuh SIEM Constant Database -->
+        <div class="export-card">
+          <div>
+            <div class="export-top">
+              <div class="export-title">Wazuh SIEM CDB List</div>
+              <span class="export-format">wazuh.cdb</span>
+            </div>
+            <p class="export-desc">
+              Constant Database (CDB) key:value list format for O(1) in-memory rule engine matching on Wazuh Manager.
+            </p>
+          </div>
+          <div class="export-actions">
+            <button class="nav-btn nav-btn-secondary" onclick="previewExport('wazuh')">View Preview</button>
+            <button class="nav-btn nav-btn-amber" onclick="downloadExport('wazuh')">Download .cdb</button>
+          </div>
+        </div>
+
+        <!-- Export 13: AWS Network Firewall -->
+        <div class="export-card">
+          <div>
+            <div class="export-top">
+              <div class="export-title">AWS Network Firewall</div>
+              <span class="export-format">aws-firewall.json</span>
+            </div>
+            <p class="export-desc">
+              Stateful IP drop rule group JSON for direct deployment to AWS Network Firewall VPC endpoints.
+            </p>
+          </div>
+          <div class="export-actions">
+            <button class="nav-btn nav-btn-secondary" onclick="previewExport('aws')">View Preview</button>
+            <button class="nav-btn nav-btn-amber" onclick="downloadExport('aws')">Download .json</button>
+          </div>
+        </div>
+
+        <!-- Export 14: Sigma Generic Detection Rules -->
+        <div class="export-card">
+          <div>
+            <div class="export-top">
+              <div class="export-title">Sigma Generic SIEM Rule</div>
+              <span class="export-format">sigma.yml</span>
+            </div>
+            <p class="export-desc">
+              Vendor-neutral Sigma YAML rule detecting network connections to confirmed malicious IPs and C2 domains.
+            </p>
+          </div>
+          <div class="export-actions">
+            <button class="nav-btn nav-btn-secondary" onclick="previewExport('sigma')">View Preview</button>
+            <button class="nav-btn nav-btn-amber" onclick="downloadExport('sigma')">Download .yml</button>
+          </div>
+        </div>
+
       </div>
 
       <!-- Export Preview Box -->

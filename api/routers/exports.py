@@ -17,6 +17,7 @@ from cti_core.exporters.firewall_blocklist import FirewallBlocklistExporter
 from cti_core.exporters.fortinet_exporter import FortinetExporter
 from cti_core.exporters.misp_exporter import MISPExporter
 from cti_core.exporters.rules_exporter import RulesExporter
+from cti_core.exporters.sigma_exporter import SigmaExporter
 from cti_core.exporters.stix_exporter import STIXExporter
 from cti_core.exporters.wazuh_exporter import WazuhExporter
 from cti_core.exporters.yara_exporter import YARAExporter
@@ -488,6 +489,38 @@ async def export_aws_network_firewall(
         media_type="application/json; charset=utf-8",
         headers={"Content-Disposition": f'inline; filename="{rule_group_name}.json"'},
     )
+
+
+@router.get(
+    "/sigma.yml",
+    response_class=Response,
+    summary="Export Sigma Generic Detection Rules",
+    description="Vendor-neutral Sigma rule detecting network connection attempts to malicious IPs and domains.",
+)
+async def export_sigma_rule(
+    min_score: float = Query(80.0, ge=0.0, le=100.0, description="Minimum confidence score threshold"),
+    title: str = Query("Sentinel CTI Malicious Indicators Detection", description="Rule title"),
+    session: AsyncSession = Depends(get_db_session),
+) -> Response:
+    """Stream Sigma YAML rule."""
+    stmt = (
+        select(IndicatorModel)
+        .where(
+            IndicatorModel.is_whitelisted.is_(False),
+            IndicatorModel.confidence_score >= min_score,
+        )
+        .order_by(IndicatorModel.confidence_score.desc())
+    )
+    result = await session.execute(stmt)
+    indicators = result.scalars().all()
+
+    rule_yaml = SigmaExporter.generate_network_rule(indicators, title=title, min_score=min_score)
+    return Response(
+        content=rule_yaml,
+        media_type="text/yaml; charset=utf-8",
+        headers={"Content-Disposition": 'inline; filename="sentinel_threats.yml"'},
+    )
+
 
 
 

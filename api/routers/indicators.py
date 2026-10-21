@@ -249,6 +249,47 @@ async def get_indicator_stats(
 
 
 @router.get(
+    "/indicators/types/summary",
+    summary="Get Indicator Taxonomy Breakdown Summary",
+    description="Detailed operational taxonomy breakdown per IoC type including average confidence and whitelist rates.",
+)
+async def get_indicator_types_summary(
+    session: AsyncSession = Depends(get_db_session),
+) -> Dict[str, Any]:
+    """Return metrics aggregated per indicator type."""
+    stmt = (
+        select(
+            IndicatorModel.type,
+            func.count(IndicatorModel.id).label("total"),
+            func.avg(IndicatorModel.confidence_score).label("avg_score"),
+            func.max(IndicatorModel.confidence_score).label("max_score"),
+            func.sum(func.case((IndicatorModel.is_whitelisted.is_(True), 1), else_=0)).label("whitelisted"),
+        )
+        .group_by(IndicatorModel.type)
+        .order_by(func.count(IndicatorModel.id).desc())
+    )
+    result = await session.execute(stmt)
+    rows = result.all()
+
+    breakdown = {}
+    for r in rows:
+        ioc_type = str(r[0])
+        total = int(r[1])
+        avg_score = round(float(r[2] or 0.0), 2)
+        max_score = round(float(r[3] or 0.0), 2)
+        whitelisted = int(r[4] or 0)
+        breakdown[ioc_type] = {
+            "total": total,
+            "active": total - whitelisted,
+            "whitelisted": whitelisted,
+            "avg_confidence": avg_score,
+            "max_confidence": max_score,
+        }
+
+    return {"summary": breakdown}
+
+
+@router.get(
     "/indicators/{value:path}",
     response_model=IndicatorRead,
     summary="Get Indicator Details",

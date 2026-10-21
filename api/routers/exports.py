@@ -10,6 +10,7 @@ from cti_core.database import get_db_session
 from cti_core.exporters.aws_network_firewall_exporter import AWSNetworkFirewallExporter
 from cti_core.exporters.checkpoint_exporter import CheckPointExporter
 from cti_core.exporters.cloudflare_exporter import CloudflareWAFExporter
+from cti_core.exporters.crowdstrike_exporter import CrowdStrikeExporter
 from cti_core.exporters.csv_exporter import CSVExporter
 from cti_core.exporters.dns_rpz_exporter import DNSRPZExporter
 from cti_core.exporters.elastic_exporter import ElasticExporter
@@ -582,6 +583,37 @@ async def export_sentinel_kql(
         media_type="text/plain; charset=utf-8",
         headers={"Content-Disposition": 'inline; filename="sentinel_hunting.kql"'},
     )
+
+
+@router.get(
+    "/crowdstrike.csv",
+    response_class=Response,
+    summary="Export CrowdStrike Falcon Custom IOC CSV",
+    description="CrowdStrike Falcon Custom IOC CSV schema for direct API or portal batch ingestion.",
+)
+async def export_crowdstrike_csv(
+    min_score: float = Query(75.0, ge=0.0, le=100.0, description="Minimum confidence score threshold"),
+    session: AsyncSession = Depends(get_db_session),
+) -> Response:
+    """Stream CrowdStrike Falcon Custom IOC CSV."""
+    stmt = (
+        select(IndicatorModel)
+        .where(
+            IndicatorModel.is_whitelisted.is_(False),
+            IndicatorModel.confidence_score >= min_score,
+        )
+        .order_by(IndicatorModel.confidence_score.desc())
+    )
+    result = await session.execute(stmt)
+    indicators = result.scalars().all()
+
+    csv_data = CrowdStrikeExporter.export_ioc_csv(indicators, min_score=min_score)
+    return Response(
+        content=csv_data,
+        media_type="text/csv; charset=utf-8",
+        headers={"Content-Disposition": 'inline; filename="crowdstrike_iocs.csv"'},
+    )
+
 
 
 

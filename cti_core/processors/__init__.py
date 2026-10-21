@@ -6,6 +6,7 @@ from cti_core.processors.dga_detector import DGADetector
 from cti_core.processors.geo_reputation import GeoReputationProcessor
 from cti_core.processors.hash_validator import HashValidator
 from cti_core.processors.ipv6_normalizer import IPv6Normalizer
+from cti_core.processors.mac_address_normalizer import MACNormalizer
 from cti_core.processors.mitre_mapper import MitreMapper
 from cti_core.processors.normalizer import (
     defang,
@@ -43,5 +44,6 @@ __all__ = [
     "UserAgentValidator",
     "HashValidator",
     "IPv6Normalizer",
+    "MACNormalizer",
     "MitreMapper",
 ]

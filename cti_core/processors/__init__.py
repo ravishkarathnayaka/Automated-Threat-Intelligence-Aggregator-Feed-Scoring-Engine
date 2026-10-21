@@ -9,6 +9,7 @@ from cti_core.processors.hash_validator import HashValidator
 from cti_core.processors.ipv6_normalizer import IPv6Normalizer
 from cti_core.processors.mac_address_normalizer import MACNormalizer
 from cti_core.processors.mitre_mapper import MitreMapper
+from cti_core.processors.port_service_mapper import PortServiceMapper
 from cti_core.processors.normalizer import (
     defang,
     identify_indicator_type,
@@ -48,4 +49,5 @@ __all__ = [
     "IPv6Normalizer",
     "MACNormalizer",
     "MitreMapper",
+    "PortServiceMapper",
 ]

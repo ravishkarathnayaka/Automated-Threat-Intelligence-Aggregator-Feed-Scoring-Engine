@@ -15,6 +15,7 @@ from cti_core.exporters.dns_rpz_exporter import DNSRPZExporter
 from cti_core.exporters.elastic_exporter import ElasticExporter
 from cti_core.exporters.firewall_blocklist import FirewallBlocklistExporter
 from cti_core.exporters.fortinet_exporter import FortinetExporter
+from cti_core.exporters.microsoft_sentinel_exporter import MicrosoftSentinelExporter
 from cti_core.exporters.misp_exporter import MISPExporter
 from cti_core.exporters.rules_exporter import RulesExporter
 from cti_core.exporters.sentinelone_exporter import SentinelOneExporter
@@ -551,6 +552,37 @@ async def export_sentinelone_s1ql(
         media_type="text/plain; charset=utf-8",
         headers={"Content-Disposition": 'inline; filename="sentinelone_hunting.s1ql"'},
     )
+
+
+@router.get(
+    "/kql.txt",
+    response_class=Response,
+    summary="Export Microsoft Sentinel KQL Hunting Queries",
+    description="Kusto Query Language (KQL) hunting queries for Microsoft Sentinel and Defender for Endpoint.",
+)
+async def export_sentinel_kql(
+    min_score: float = Query(75.0, ge=0.0, le=100.0, description="Minimum confidence score threshold"),
+    session: AsyncSession = Depends(get_db_session),
+) -> Response:
+    """Stream Microsoft Sentinel KQL queries."""
+    stmt = (
+        select(IndicatorModel)
+        .where(
+            IndicatorModel.is_whitelisted.is_(False),
+            IndicatorModel.confidence_score >= min_score,
+        )
+        .order_by(IndicatorModel.confidence_score.desc())
+    )
+    result = await session.execute(stmt)
+    indicators = result.scalars().all()
+
+    kql = MicrosoftSentinelExporter.export_kql(indicators, min_score=min_score)
+    return Response(
+        content=kql,
+        media_type="text/plain; charset=utf-8",
+        headers={"Content-Disposition": 'inline; filename="sentinel_hunting.kql"'},
+    )
+
 
 
 

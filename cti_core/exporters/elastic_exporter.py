@@ -47,6 +47,9 @@ class ElasticExporter:
             if is_whitelisted or score < min_score:
                 continue
 
+            clean_sources = [s.source_name if hasattr(s, "source_name") else str(s) for s in sources]
+            clean_tags = [t.name if hasattr(t, "name") else str(t) for t in tags]
+
             doc_id = f"sentinel-{ioc_type}-{norm_val.replace('/', '_')}"
             action_line = {"index": {"_index": index_name, "_id": doc_id}}
 
@@ -60,10 +63,10 @@ class ElasticExporter:
                     },
                     "feed": {
                         "name": "SENTINEL-CTI",
-                        "sources": sources,
+                        "sources": clean_sources,
                     },
                 },
-                "tags": tags,
+                "tags": clean_tags,
             }
 
             lines.append(json.dumps(action_line))

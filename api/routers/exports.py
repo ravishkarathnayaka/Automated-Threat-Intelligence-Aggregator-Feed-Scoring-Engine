@@ -452,7 +452,7 @@ async def export_wazuh_cdb(
     result = await session.execute(stmt)
     indicators = result.scalars().all()
 
-    content = WazuhExporter.export_cdb_list(indicators, min_score=min_score)
+    content = WazuhExporter.export_cdb(indicators, min_score=min_score)
     return Response(
         content=content,
         media_type="text/plain; charset=utf-8",
@@ -547,7 +547,7 @@ async def export_sentinelone_s1ql(
     result = await session.execute(stmt)
     indicators = result.scalars().all()
 
-    s1ql = SentinelOneExporter.export_s1ql(indicators, min_score=min_score)
+    s1ql = SentinelOneExporter.export_query(indicators, min_score=min_score)
     return Response(
         content=s1ql,
         media_type="text/plain; charset=utf-8",
@@ -607,7 +607,7 @@ async def export_crowdstrike_csv(
     result = await session.execute(stmt)
     indicators = result.scalars().all()
 
-    csv_data = CrowdStrikeExporter.export_ioc_csv(indicators, min_score=min_score)
+    csv_data = CrowdStrikeExporter.export(indicators, min_score=min_score)
     return Response(
         content=csv_data,
         media_type="text/csv; charset=utf-8",

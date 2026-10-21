@@ -8,6 +8,7 @@ from cti_core.collectors.greensnow import GreenSnowCollector
 from cti_core.collectors.greynoise import GreyNoiseCollector
 from cti_core.collectors.openphish import OpenPhishCollector
 from cti_core.collectors.otx_collector import OTXCollector
+from cti_core.collectors.phishtank import PhishTankCollector
 from cti_core.collectors.spamhaus_drop import SpamhausDROPCollector
 from cti_core.collectors.sslbl import SSLBLCollector
 from cti_core.collectors.threatfox import ThreatFoxCollector
@@ -31,6 +32,7 @@ __all__ = [
     "GreyNoiseCollector",
     "OpenPhishCollector",
     "OTXCollector",
+    "PhishTankCollector",
     "SpamhausDROPCollector",
     "SSLBLCollector",
     "ThreatFoxCollector",

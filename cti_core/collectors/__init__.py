@@ -11,6 +11,7 @@ from cti_core.collectors.threatfox import ThreatFoxCollector
 from cti_core.collectors.tor_nodes import TorExitNodesCollector
 from cti_core.collectors.urlhaus import URLhausCollector
 from cti_core.collectors.urlscan import URLScanCollector
+from cti_core.collectors.vxvault import VXVaultCollector
 
 __all__ = [
     "BaseCollector",
@@ -18,6 +19,7 @@ __all__ = [
     "BlocklistDeCollector",
     "URLhausCollector",
     "URLScanCollector",
+    "VXVaultCollector",
     "CISAKEVCollector",
     "FeodoTrackerCollector",
     "GreyNoiseCollector",

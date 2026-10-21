@@ -1,5 +1,6 @@
 from cti_core.scoring.bayesian_scorer import BayesianScorer
 from cti_core.scoring.consensus import ConsensusScorer
+from cti_core.scoring.decay_curves import LogisticSigmoidDecayModel
 from cti_core.scoring.decay_models import HalfLifeDecayModel
 from cti_core.scoring.feed_reliability_tracker import FeedReliabilityTracker
 from cti_core.scoring.reputation_tiers import HysteresisTierEvaluator
@@ -18,6 +19,7 @@ __all__ = [
     "ConsensusScorer",
     "FeedReliabilityTracker",
     "HalfLifeDecayModel",
+    "LogisticSigmoidDecayModel",
     "HysteresisTierEvaluator",
     "TenantProfile",
     "TenantProfileManager",

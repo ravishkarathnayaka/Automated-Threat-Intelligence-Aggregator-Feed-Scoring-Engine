@@ -9,6 +9,7 @@ from cti_core.exporters.dns_rpz_exporter import DNSRPZExporter
 from cti_core.exporters.firewall_blocklist import FirewallBlocklistExporter
 from cti_core.exporters.misp_exporter import MISPExporter
 from cti_core.exporters.rules_exporter import RulesExporter
+from cti_core.exporters.sigma_exporter import SigmaExporter
 from cti_core.exporters.stix_exporter import STIXExporter
 from cti_core.exporters.yara_exporter import YARAExporter
 from cti_core.exporters.zeek_exporter import ZeekIntelExporter
@@ -89,6 +90,11 @@ def build_parser() -> argparse.ArgumentParser:
     # Command: dga-check
     dga_p = subparsers.add_parser("dga-check", help="Batch lexical and entropy analysis for algorithmically generated domains")
     dga_p.add_argument("domains", type=str, help="Comma-separated domains to evaluate")
+
+    # Command: sigma-gen
+    sigma_p = subparsers.add_parser("sigma-gen", help="Generate vendor-agnostic Sigma detection rule on the fly")
+    sigma_p.add_argument("indicators", type=str, help="Comma-separated IP or domain indicators")
+    sigma_p.add_argument("--title", type=str, default="Ad-hoc CTI Threat Detection", help="Sigma rule title")
 
     return parser
 
@@ -275,6 +281,22 @@ def main(args: Optional[List[str]] = None) -> int:
                 "classification": reason,
             })
         print(json.dumps(batch_out, indent=2))
+        return 0
+
+    elif parsed.command == "sigma-gen":
+        raw_list = [x.strip() for x in parsed.indicators.split(",") if x.strip()]
+        indicator_dicts = []
+        for v in raw_list:
+            clean = refang(v)
+            ioc_type, norm = identify_indicator_type(clean)
+            indicator_dicts.append({
+                "normalized_value": norm,
+                "type": ioc_type.value,
+                "confidence_score": 90.0,
+                "is_whitelisted": False,
+            })
+        rule = SigmaExporter.generate_network_rule(indicator_dicts, title=parsed.title, min_score=70.0)
+        print(rule)
         return 0
 
     return 0

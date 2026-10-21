@@ -19,6 +19,7 @@ from cti_core.processors.cidr_filter import CIDRFilter
 from cti_core.processors.dga_detector import DGADetector
 from cti_core.processors.normalizer import defang, identify_indicator_type, refang
 from cti_core.processors.punycode import PunycodeProcessor
+from cti_core.scoring.bayesian_scorer import BayesianScorer
 from cti_core.scoring.scoring_engine import global_scoring_engine
 
 
@@ -95,6 +96,12 @@ def build_parser() -> argparse.ArgumentParser:
     sigma_p = subparsers.add_parser("sigma-gen", help="Generate vendor-agnostic Sigma detection rule on the fly")
     sigma_p.add_argument("indicators", type=str, help="Comma-separated IP or domain indicators")
     sigma_p.add_argument("--title", type=str, default="Ad-hoc CTI Threat Detection", help="Sigma rule title")
+
+    # Command: bayesian
+    bayes_p = subparsers.add_parser("bayesian", help="Simulate Bayesian posterior probability update")
+    bayes_p.add_argument("sources", type=str, help="Comma-separated reporting sources (e.g. virustotal,threatfox)")
+    bayes_p.add_argument("--prior", type=float, default=0.15, help="Prior probability (default 0.15)")
+    bayes_p.add_argument("--benign", type=int, default=0, help="Number of benign whitelist confirmations")
 
     return parser
 
@@ -297,6 +304,22 @@ def main(args: Optional[List[str]] = None) -> int:
             })
         rule = SigmaExporter.generate_network_rule(indicator_dicts, title=parsed.title, min_score=70.0)
         print(rule)
+        return 0
+
+    elif parsed.command == "bayesian":
+        src_list = [s.strip() for s in parsed.sources.split(",") if s.strip()]
+        posterior_prob = BayesianScorer.update_probability(
+            src_list, prior=parsed.prior, benign_confirmations=parsed.benign
+        )
+        score = BayesianScorer.probability_to_score(posterior_prob)
+        sim_out = {
+            "sources": src_list,
+            "prior_probability": parsed.prior,
+            "benign_counter_evidence": parsed.benign,
+            "posterior_probability": round(posterior_prob, 4),
+            "bayesian_confidence_score": score,
+        }
+        print(json.dumps(sim_out, indent=2))
         return 0
 
     return 0

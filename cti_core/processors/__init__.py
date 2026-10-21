@@ -1,5 +1,6 @@
 from cti_core.processors.asn_lookup import ASNReputationProcessor
 from cti_core.processors.cidr_filter import CIDRFilter
+from cti_core.processors.cve_cvss_parser import CVSSParser
 from cti_core.processors.deduplicator import Deduplicator
 from cti_core.processors.dga_detector import DGADetector
 from cti_core.processors.geo_reputation import GeoReputationProcessor
@@ -31,6 +32,7 @@ __all__ = [
     "GeoReputationProcessor",
     "WhitelistFilter",
     "CIDRFilter",
+    "CVSSParser",
     "PunycodeProcessor",
     "SSDeepComparator",
     "SubdomainFlattener",

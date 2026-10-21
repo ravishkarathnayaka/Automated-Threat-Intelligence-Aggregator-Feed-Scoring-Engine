@@ -412,6 +412,27 @@ curl -X POST "http://localhost:8000/api/v1/indicators" \
 Export threat intelligence in specialized vendor formats:
 
 ```bash
+# Elasticsearch & OpenSearch Bulk NDJSON Feed
+curl -X GET "http://localhost:8000/api/v1/export/elastic.ndjson?min_score=70"
+
+# Wazuh SIEM Constant Database (CDB) List
+curl -X GET "http://localhost:8000/api/v1/export/wazuh.cdb?min_score=70"
+
+# AWS Network Firewall Stateful Drop Rule Group JSON
+curl -X GET "http://localhost:8000/api/v1/export/aws-firewall.json?min_score=75"
+
+# Vendor-Neutral Sigma YAML Detection Rule
+curl -X GET "http://localhost:8000/api/v1/export/sigma.yml?min_score=80"
+
+# SentinelOne Deep Visibility S1QL Hunting Query
+curl -X GET "http://localhost:8000/api/v1/export/sentinelone.s1ql?min_score=75"
+
+# Microsoft Sentinel & Defender KQL Hunting Queries
+curl -X GET "http://localhost:8000/api/v1/export/kql.txt?min_score=75"
+
+# CrowdStrike Falcon Custom IOC CSV
+curl -X GET "http://localhost:8000/api/v1/export/crowdstrike.csv?min_score=75"
+
 # Check Point Security Gateway formatted feed
 curl -X GET "http://localhost:8000/api/v1/export/checkpoint.txt?min_score=70"
 
@@ -430,6 +451,9 @@ curl -X GET "http://localhost:8000/api/v1/export/yara.yar?min_score=75"
 # Tabular CSV / TSV Report
 curl -X GET "http://localhost:8000/api/v1/export/indicators.csv?min_score=50"
 
+# Indicator Taxonomy Summary
+curl -X GET "http://localhost:8000/api/v1/indicators/types/summary"
+
 # High-Level Engine Telemetry & Stats
 curl -X GET "http://localhost:8000/api/v1/stats"
 ```
@@ -441,8 +465,23 @@ curl -X GET "http://localhost:8000/api/v1/stats"
 The repository includes a dedicated command-line utility for offline threat investigation and automation:
 
 ```bash
+# Print system diagnostic banner
+python -m cti_core.cli --banner
+
 # Compute composite confidence score for an IoC
 python -m cti_core.cli score 185[.]220[.]101[.]5 --source abuseipdb
+
+# Evaluate Autonomous System Number (ASN) risk reputation
+python -m cti_core.cli asn AS200019
+
+# Batch lexical and Shannon entropy analysis for DGA domains
+python -m cti_core.cli dga-check "apple.com,xqjkzxpvnm91823a.biz"
+
+# Generate ad-hoc Sigma detection rule from IPs or domains
+python -m cti_core.cli sigma-gen "185.220.101.5,c2-command.org" --title "Urgent C2 Containment"
+
+# Simulate sequential Bayesian probability updating
+python -m cti_core.cli bayesian "virustotal,threatfox" --prior 0.15
 
 # Verify Bogon / RFC 1918 suppression
 python -m cti_core.cli bogon 10.0.0.1
@@ -458,11 +497,16 @@ python -m cti_core.cli bulk-score "198.51.100.1,malicious.biz,e3b0c442..."
 
 # Analyze domain for IDN / Punycode homograph attacks
 python -m cti_core.cli check-domain xn--pple-43d.com
-
-# Export enforcement feeds directly to stdout
-python -m cti_core.cli export --format yara --min-score 75
-python -m cti_core.cli export --format misp --min-score 70
 ```
+
+---
+
+## 📚 Technical Documentation
+
+- 📘 [SIEM & SOAR Enterprise Integration Guide](docs/SIEM_INTEGRATION_GUIDE.md)
+- 🗂️ [Threat Feed Taxonomy & Reliability Matrix](docs/THREAT_FEED_TAXONOMY.md)
+- 📐 [Mathematical Scoring & Probability Models Specification](docs/SCORING_MATH_SPECIFICATION.md)
+- 📖 [Operational Runbook & Troubleshooting](docs/OPERATIONAL_RUNBOOK.md)
 
 ---
 

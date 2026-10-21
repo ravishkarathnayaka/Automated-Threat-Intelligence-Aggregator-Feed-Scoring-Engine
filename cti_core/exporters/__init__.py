@@ -1,4 +1,5 @@
 from cti_core.exporters.aws_network_firewall_exporter import AWSNetworkFirewallExporter
+from cti_core.exporters.azure_firewall_exporter import AzureFirewallExporter
 from cti_core.exporters.checkpoint_exporter import CheckPointExporter
 from cti_core.exporters.carbon_black_exporter import CarbonBlackExporter
 from cti_core.exporters.cloudflare_exporter import CloudflareWAFExporter
@@ -21,6 +22,7 @@ from cti_core.exporters.zeek_exporter import ZeekIntelExporter
 
 __all__ = [
     "AWSNetworkFirewallExporter",
+    "AzureFirewallExporter",
     "CheckPointExporter",
     "CarbonBlackExporter",
     "CloudflareWAFExporter",

@@ -1,4 +1,5 @@
 from cti_core.exporters.checkpoint_exporter import CheckPointExporter
+from cti_core.exporters.carbon_black_exporter import CarbonBlackExporter
 from cti_core.exporters.cloudflare_exporter import CloudflareWAFExporter
 from cti_core.exporters.crowdstrike_exporter import CrowdStrikeExporter
 from cti_core.exporters.csv_exporter import CSVExporter
@@ -19,6 +20,7 @@ from cti_core.exporters.zeek_exporter import ZeekIntelExporter
 
 __all__ = [
     "CheckPointExporter",
+    "CarbonBlackExporter",
     "CloudflareWAFExporter",
     "CrowdStrikeExporter",
     "CSVExporter",

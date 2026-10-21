@@ -13,6 +13,7 @@ from cti_core.exporters.stix_exporter import STIXExporter
 from cti_core.exporters.yara_exporter import YARAExporter
 from cti_core.exporters.zeek_exporter import ZeekIntelExporter
 from cti_core.mock_data import get_synthetic_indicators
+from cti_core.processors.asn_lookup import ASNReputationProcessor
 from cti_core.processors.cidr_filter import CIDRFilter
 from cti_core.processors.dga_detector import DGADetector
 from cti_core.processors.normalizer import defang, identify_indicator_type, refang
@@ -80,6 +81,10 @@ def build_parser() -> argparse.ArgumentParser:
     # Command: entropy
     entropy_p = subparsers.add_parser("entropy", help="Calculate Shannon entropy and DGA score for a domain")
     entropy_p.add_argument("domain", type=str, help="Domain string to evaluate")
+
+    # Command: asn
+    asn_p = subparsers.add_parser("asn", help="Evaluate Autonomous System Number (ASN) risk reputation")
+    asn_p.add_argument("asn", type=str, help="ASN identifier (e.g. AS200019, AS16509, 44477)")
 
     return parser
 
@@ -241,6 +246,17 @@ def main(args: Optional[List[str]] = None) -> int:
             "classification": reason,
         }
         print(json.dumps(result, indent=2))
+        return 0
+
+    elif parsed.command == "asn":
+        penalty, desc = ASNReputationProcessor.evaluate(parsed.asn)
+        out = {
+            "asn": parsed.asn.upper() if parsed.asn.upper().startswith("AS") else f"AS{parsed.asn.upper()}",
+            "risk_penalty": penalty,
+            "classification": desc,
+            "is_bulletproof": "bulletproof" in desc.lower(),
+        }
+        print(json.dumps(out, indent=2))
         return 0
 
     return 0

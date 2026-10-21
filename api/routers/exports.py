@@ -17,6 +17,7 @@ from cti_core.exporters.firewall_blocklist import FirewallBlocklistExporter
 from cti_core.exporters.fortinet_exporter import FortinetExporter
 from cti_core.exporters.misp_exporter import MISPExporter
 from cti_core.exporters.rules_exporter import RulesExporter
+from cti_core.exporters.sentinelone_exporter import SentinelOneExporter
 from cti_core.exporters.sigma_exporter import SigmaExporter
 from cti_core.exporters.stix_exporter import STIXExporter
 from cti_core.exporters.wazuh_exporter import WazuhExporter
@@ -520,6 +521,37 @@ async def export_sigma_rule(
         media_type="text/yaml; charset=utf-8",
         headers={"Content-Disposition": 'inline; filename="sentinel_threats.yml"'},
     )
+
+
+@router.get(
+    "/sentinelone.s1ql",
+    response_class=Response,
+    summary="Export SentinelOne Deep Visibility S1QL Query",
+    description="SentinelOne S1QL Deep Visibility hunting query for enterprise endpoint telemetry.",
+)
+async def export_sentinelone_s1ql(
+    min_score: float = Query(75.0, ge=0.0, le=100.0, description="Minimum confidence score threshold"),
+    session: AsyncSession = Depends(get_db_session),
+) -> Response:
+    """Stream SentinelOne S1QL hunting query."""
+    stmt = (
+        select(IndicatorModel)
+        .where(
+            IndicatorModel.is_whitelisted.is_(False),
+            IndicatorModel.confidence_score >= min_score,
+        )
+        .order_by(IndicatorModel.confidence_score.desc())
+    )
+    result = await session.execute(stmt)
+    indicators = result.scalars().all()
+
+    s1ql = SentinelOneExporter.export_s1ql(indicators, min_score=min_score)
+    return Response(
+        content=s1ql,
+        media_type="text/plain; charset=utf-8",
+        headers={"Content-Disposition": 'inline; filename="sentinelone_hunting.s1ql"'},
+    )
+
 
 
 

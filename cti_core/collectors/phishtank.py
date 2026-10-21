@@ -75,7 +75,7 @@ class PhishTankCollector(BaseCollector):
                 "source_weight": self.source_weight,
                 "reported_confidence": 92.0,
                 "reported_at": now_iso,
-                "tags": ["phishtank", "m365-phish", "credential-theft"],
+                "tags": ["phishtank", "verified-phishing", "m365-phish", "credential-theft"],
                 "reference_url": "https://phishtank.org/phish_detail.php?phish_id=987124",
             },
         ]

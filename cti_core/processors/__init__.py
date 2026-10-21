@@ -19,6 +19,7 @@ from cti_core.processors.subdomain_flattener import SubdomainFlattener
 from cti_core.processors.tld_reputation import TLDReputationProcessor
 from cti_core.processors.tls_fingerprint import TLSFingerprintValidator
 from cti_core.processors.url_sanitizer import URLSanitizer
+from cti_core.processors.user_agent_parser import UserAgentValidator
 from cti_core.processors.whitelist_filter import WhitelistFilter
 
 __all__ = [
@@ -39,6 +40,7 @@ __all__ = [
     "TLDReputationProcessor",
     "TLSFingerprintValidator",
     "URLSanitizer",
+    "UserAgentValidator",
     "HashValidator",
     "IPv6Normalizer",
     "MitreMapper",

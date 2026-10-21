@@ -3,7 +3,7 @@
 from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy import func, select
+from sqlalchemy import case, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from cti_core.database import get_db_session
@@ -263,7 +263,7 @@ async def get_indicator_types_summary(
             func.count(IndicatorModel.id).label("total"),
             func.avg(IndicatorModel.confidence_score).label("avg_score"),
             func.max(IndicatorModel.confidence_score).label("max_score"),
-            func.sum(func.case((IndicatorModel.is_whitelisted.is_(True), 1), else_=0)).label("whitelisted"),
+            func.sum(case((IndicatorModel.is_whitelisted.is_(True), 1), else_=0)).label("whitelisted"),
         )
         .group_by(IndicatorModel.type)
         .order_by(func.count(IndicatorModel.id).desc())

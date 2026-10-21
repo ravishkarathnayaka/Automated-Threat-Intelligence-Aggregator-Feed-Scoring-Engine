@@ -713,6 +713,72 @@ function generateExportContent(format) {
     return rows.join("\n");
   }
 
+  if (format === "elastic") {
+    const nowIso = new Date().toISOString();
+    return highIocs.map(i => {
+      const action = JSON.stringify({ index: { _index: "threat-intel-indicators", _id: `sentinel-${i.type}-${i.normalized_value}` } });
+      const doc = JSON.stringify({
+        "@timestamp": nowIso,
+        threat: {
+          indicator: { type: i.type, value: i.normalized_value, confidence: Math.round(i.confidence_score) },
+          feed: { name: "SENTINEL-CTI", sources: (i.sources || []).map(s => s.source_name || s) }
+        },
+        tags: i.tags || []
+      });
+      return `${action}\n${doc}`;
+    }).join("\n");
+  }
+
+  if (format === "wazuh") {
+    return highIocs.map(i => `${i.normalized_value}:${i.confidence_score >= 85 ? "critical" : "high"}`).join("\n");
+  }
+
+  if (format === "aws") {
+    const ipRules = highIocs.filter(i => i.type === "ipv4" || i.type === "ipv6").map((i, idx) => ({
+      Action: "DROP",
+      Header: {
+        Direction: "FORWARD",
+        Protocol: "IP",
+        Source: "ANY",
+        SourcePort: "ANY",
+        Destination: i.normalized_value.includes("/") ? i.normalized_value : `${i.normalized_value}/32`,
+        DestinationPort: "ANY"
+      },
+      RuleOptions: [
+        { Keyword: `msg:"Sentinel CTI Block [${i.normalized_value}]"` },
+        { Keyword: `sid:${3000000 + idx}` }
+      ]
+    }));
+    return JSON.stringify({
+      RuleGroup: {
+        RuleGroupName: "Sentinel-CTI-Blocklist",
+        Type: "STATEFUL",
+        Capacity: 1000,
+        RulesSource: { StatefulRules: ipRules }
+      }
+    }, null, 2);
+  }
+
+  if (format === "sigma") {
+    const ips = highIocs.filter(i => i.type === "ipv4" || i.type === "ipv6").map(i => `            - '${i.normalized_value}'`).join("\n") || "            - '127.0.0.1'";
+    const doms = highIocs.filter(i => i.type === "domain").map(i => `            - '${i.normalized_value}'`).join("\n") || "            - 'example.invalid'";
+    return `title: Sentinel CTI Malicious Indicators Detection
+id: cti-engine-detection-auto
+status: experimental
+description: Detects network traffic to confirmed CTI indicators
+logsource:
+    category: network_connection
+detection:
+    selection_ip:
+        DestinationIp:
+${ips}
+    selection_dns:
+        query:
+${doms}
+    condition: selection_ip or selection_dns
+level: high`;
+  }
+
   return "";
 }
 
@@ -735,7 +801,11 @@ function downloadExport(format) {
     csv: "csv",
     checkpoint: "txt",
     fortinet: "txt",
-    firewall: "txt"
+    firewall: "txt",
+    elastic: "ndjson",
+    wazuh: "cdb",
+    aws: "json",
+    sigma: "yml"
   };
   const ext = extMap[format] || "txt";
   const filename = `threat_intel_${format}.${ext}`;

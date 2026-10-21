@@ -12,6 +12,7 @@ from cti_core.exporters.fortinet_exporter import FortinetExporter
 from cti_core.exporters.microsoft_sentinel_exporter import MicrosoftSentinelExporter
 from cti_core.exporters.misp_exporter import MISPExporter
 from cti_core.exporters.pan_os_exporter import PanOSExporter
+from cti_core.exporters.qradar_exporter import QRadarExporter
 from cti_core.exporters.rules_exporter import RulesExporter
 from cti_core.exporters.sentinelone_exporter import SentinelOneExporter
 from cti_core.exporters.stix_exporter import STIXExporter
@@ -42,4 +43,5 @@ __all__ = [
     "YARAExporter",
     "ZeekIntelExporter",
     "PanOSExporter",
+    "QRadarExporter",
 ]

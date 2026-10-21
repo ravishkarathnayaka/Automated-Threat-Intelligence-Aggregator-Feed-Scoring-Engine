@@ -2,6 +2,7 @@ from cti_core.processors.asn_lookup import ASNReputationProcessor
 from cti_core.processors.cidr_filter import CIDRFilter
 from cti_core.processors.cve_cvss_parser import CVSSParser
 from cti_core.processors.deduplicator import Deduplicator
+from cti_core.processors.email_address_sanitizer import EmailSanitizer
 from cti_core.processors.dga_detector import DGADetector
 from cti_core.processors.geo_reputation import GeoReputationProcessor
 from cti_core.processors.hash_validator import HashValidator
@@ -30,6 +31,7 @@ __all__ = [
     "normalize_indicator",
     "ASNReputationProcessor",
     "Deduplicator",
+    "EmailSanitizer",
     "DGADetector",
     "GeoReputationProcessor",
     "WhitelistFilter",

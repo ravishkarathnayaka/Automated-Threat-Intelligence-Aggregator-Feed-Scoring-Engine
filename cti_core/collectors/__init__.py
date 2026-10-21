@@ -12,6 +12,7 @@ from cti_core.collectors.spamhaus_drop import SpamhausDROPCollector
 from cti_core.collectors.sslbl import SSLBLCollector
 from cti_core.collectors.threatfox import ThreatFoxCollector
 from cti_core.collectors.tor_nodes import TorExitNodesCollector
+from cti_core.collectors.tweetfeed import TweetFeedCollector
 from cti_core.collectors.urlhaus import URLhausCollector
 from cti_core.collectors.urlscan import URLScanCollector
 from cti_core.collectors.vxvault import VXVaultCollector
@@ -34,4 +35,5 @@ __all__ = [
     "SSLBLCollector",
     "ThreatFoxCollector",
     "TorExitNodesCollector",
+    "TweetFeedCollector",
 ]

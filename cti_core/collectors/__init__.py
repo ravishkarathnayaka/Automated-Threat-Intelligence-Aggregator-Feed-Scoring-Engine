@@ -4,6 +4,7 @@ from cti_core.collectors.blocklist_de import BlocklistDeCollector
 from cti_core.collectors.cinsscore import CINSArmyCollector
 from cti_core.collectors.cisa_kev import CISAKEVCollector
 from cti_core.collectors.feodo_tracker import FeodoTrackerCollector
+from cti_core.collectors.greensnow import GreenSnowCollector
 from cti_core.collectors.greynoise import GreyNoiseCollector
 from cti_core.collectors.openphish import OpenPhishCollector
 from cti_core.collectors.otx_collector import OTXCollector
@@ -25,6 +26,7 @@ __all__ = [
     "VXVaultCollector",
     "CISAKEVCollector",
     "FeodoTrackerCollector",
+    "GreenSnowCollector",
     "GreyNoiseCollector",
     "OpenPhishCollector",
     "OTXCollector",

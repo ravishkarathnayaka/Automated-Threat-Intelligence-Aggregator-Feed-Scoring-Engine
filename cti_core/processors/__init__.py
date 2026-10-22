@@ -1,6 +1,7 @@
 from cti_core.processors.asn_lookup import ASNReputationProcessor
 from cti_core.processors.asn_peer_evaluator import ASNPeerEvaluator
 from cti_core.processors.cidr_filter import CIDRFilter
+from cti_core.processors.co_occurrence_clusterer import CoOccurrenceClusterer
 from cti_core.processors.cve_cvss_parser import CVSSParser
 from cti_core.processors.deduplicator import Deduplicator
 from cti_core.processors.email_address_sanitizer import EmailSanitizer
@@ -44,6 +45,7 @@ __all__ = [
     "WhitelistFilter",
     "RegistrarClassifier",
     "CIDRFilter",
+    "CoOccurrenceClusterer",
     "CVSSParser",
     "PunycodeProcessor",
     "SSDeepComparator",

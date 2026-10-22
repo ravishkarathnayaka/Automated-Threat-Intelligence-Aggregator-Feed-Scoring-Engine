@@ -24,6 +24,7 @@ from cti_core.exporters.sentinelone_exporter import SentinelOneExporter
 from cti_core.exporters.sigma_exporter import SigmaExporter
 from cti_core.exporters.splunk_lookup_exporter import SplunkLookupExporter
 from cti_core.exporters.stix_exporter import STIXExporter
+from cti_core.exporters.tanium_exporter import TaniumExporter
 from cti_core.exporters.wazuh_exporter import WazuhExporter
 from cti_core.exporters.yara_exporter import YARAExporter
 from cti_core.exporters.zeek_exporter import ZeekIntelExporter
@@ -676,6 +677,38 @@ async def export_palo_alto_edl(
         media_type="text/plain; charset=utf-8",
         headers={"Content-Disposition": 'inline; filename="pan_os_edl.txt"'},
     )
+
+
+@router.get(
+    "/tanium.json",
+    response_class=Response,
+    summary="Export Tanium Threat Response IOC Package",
+    description="JSON definition formatted for Tanium Threat Response endpoint scanning.",
+)
+async def export_tanium_package(
+    min_score: float = Query(70.0, ge=0.0, le=100.0, description="Minimum confidence score threshold"),
+    package_name: str = Query("Sentinel-Threat-Response-Package", description="Tanium package name"),
+    session: AsyncSession = Depends(get_db_session),
+) -> Response:
+    """Stream Tanium Threat Response package JSON."""
+    stmt = (
+        select(IndicatorModel)
+        .where(
+            IndicatorModel.is_whitelisted.is_(False),
+            IndicatorModel.confidence_score >= min_score,
+        )
+        .order_by(IndicatorModel.confidence_score.desc())
+    )
+    result = await session.execute(stmt)
+    indicators = result.scalars().all()
+
+    pkg_json = TaniumExporter.export_json(indicators, package_name=package_name, min_score=min_score)
+    return Response(
+        content=pkg_json,
+        media_type="application/json; charset=utf-8",
+        headers={"Content-Disposition": f'inline; filename="{package_name}.json"'},
+    )
+
 
 
 

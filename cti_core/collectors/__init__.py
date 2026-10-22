@@ -6,6 +6,7 @@ from cti_core.collectors.cinsscore import CINSArmyCollector
 from cti_core.collectors.cisa_kev import CISAKEVCollector
 from cti_core.collectors.dataplane import DataplaneCollector
 from cti_core.collectors.feodo_tracker import FeodoTrackerCollector
+from cti_core.collectors.feodo_ip_blocklist_collector import FeodoIPBlocklistCollector
 from cti_core.collectors.greensnow import GreenSnowCollector
 from cti_core.collectors.greynoise import GreyNoiseCollector
 from cti_core.collectors.inversion_dnsbl_collector import InversionDNSBLCollector
@@ -38,6 +39,7 @@ __all__ = [
     "CISAKEVCollector",
     "DataplaneCollector",
     "FeodoTrackerCollector",
+    "FeodoIPBlocklistCollector",
     "GreenSnowCollector",
     "GreyNoiseCollector",
     "InversionDNSBLCollector",

@@ -1,4 +1,5 @@
 from cti_core.collectors.abuseipdb import AbuseIPDBCollector
+from cti_core.collectors.bambenek_c2_collector import BambenekC2Collector
 from cti_core.collectors.base import BaseCollector
 from cti_core.collectors.blocklist_de import BlocklistDeCollector
 from cti_core.collectors.cinsscore import CINSArmyCollector
@@ -23,6 +24,7 @@ from cti_core.collectors.vxvault import VXVaultCollector
 
 __all__ = [
     "BaseCollector",
+    "BambenekC2Collector",
     "AbuseIPDBCollector",
     "BlocklistDeCollector",
     "CINSArmyCollector",

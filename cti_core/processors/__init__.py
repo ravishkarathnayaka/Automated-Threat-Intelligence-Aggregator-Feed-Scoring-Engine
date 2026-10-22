@@ -7,6 +7,7 @@ from cti_core.processors.dga_detector import DGADetector
 from cti_core.processors.geo_reputation import GeoReputationProcessor
 from cti_core.processors.hash_validator import HashValidator
 from cti_core.processors.ipv6_normalizer import IPv6Normalizer
+from cti_core.processors.ja4_fingerprint_processor import JA4FingerprintProcessor
 from cti_core.processors.mac_address_normalizer import MACNormalizer
 from cti_core.processors.mitre_mapper import MitreMapper
 from cti_core.processors.port_service_mapper import PortServiceMapper
@@ -48,6 +49,7 @@ __all__ = [
     "URLSanitizer",
     "UserAgentValidator",
     "HashValidator",
+    "JA4FingerprintProcessor",
     "IPv6Normalizer",
     "MACNormalizer",
     "MitreMapper",

@@ -3,6 +3,7 @@
 from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from pydantic import BaseModel, Field
 from sqlalchemy import case, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -16,6 +17,9 @@ from cti_core.models.indicator import (
     SourceMetadata,
 )
 from cti_core.pipeline import CTIPipeline, global_pipeline
+from cti_core.scoring.kalman_confidence_filter import KalmanConfidenceFilter
+from cti_core.scoring.markov_threat_state import MarkovThreatStateModel, ThreatState
+from cti_core.scoring.weibull_reliability_model import WeibullReliabilityModel
 
 router = APIRouter(prefix="/api/v1", tags=["Indicators"])
 
@@ -323,3 +327,60 @@ async def run_pipeline_cycle(
     """Execute pipeline ingestion cycle."""
     result = await global_pipeline.run_pipeline(session, use_live=live)
     return result
+
+
+class SimulationRequest(BaseModel):
+    initial_score: float = Field(80.0, ge=0.0, le=100.0)
+    ioc_type: str = Field("ipv4", description="Indicator type (ipv4, domain, url, sha256)")
+    age_days: float = Field(7.0, ge=0.0, description="Age in days for Weibull survival decay")
+    measurements: List[float] = Field(default_factory=lambda: [70.0, 75.0, 85.0, 90.0], description="Sequential sensor scores for Kalman filtering")
+    current_state: str = Field("active", description="Current Markov threat state (dormant, active, monitored, remediated)")
+
+
+class SimulationResponse(BaseModel):
+    weibull_decayed_score: float
+    weibull_survival_prob: float
+    kalman_filtered_score: float
+    kalman_variance: float
+    markov_next_probabilities: Dict[str, float]
+
+
+@router.post(
+    "/scoring/simulate",
+    response_model=SimulationResponse,
+    summary="Simulate Mathematical Threat State & Reliability Models",
+    description="Run Weibull survival decay, Kalman filter score convergence, and Markov state transition predictions.",
+)
+async def simulate_scoring(payload: SimulationRequest) -> SimulationResponse:
+    """Run mathematical scoring models simulation."""
+    decayed = WeibullReliabilityModel.calculate_weibull_decayed_score(
+        initial_score=payload.initial_score,
+        age_days=payload.age_days,
+        ioc_type=payload.ioc_type,
+    )
+    survival = WeibullReliabilityModel.survival_probability(
+        age_days=payload.age_days,
+        ioc_type=payload.ioc_type,
+    )
+
+    kf = KalmanConfidenceFilter(initial_confidence=payload.initial_score)
+    final_score = payload.initial_score
+    var = 100.0
+    for m in payload.measurements:
+        final_score, var = kf.update(m)
+
+    try:
+        st = ThreatState(payload.current_state.lower())
+    except ValueError:
+        st = ThreatState.ACTIVE
+    probs = MarkovThreatStateModel.step_probability(st)
+    str_probs = {k.value: v for k, v in probs.items()}
+
+    return SimulationResponse(
+        weibull_decayed_score=decayed,
+        weibull_survival_prob=round(survival, 4),
+        kalman_filtered_score=final_score,
+        kalman_variance=var,
+        markov_next_probabilities=str_probs,
+    )
+

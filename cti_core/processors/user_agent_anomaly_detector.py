@@ -37,7 +37,7 @@ class UserAgentAnomalyDetector:
         has_mozilla = "mozilla" in ua.lower()
         has_platform = any(k in ua.lower() for k in ["windows", "macintosh", "linux", "android", "iphone"])
 
-        if entropy > 4.6 and not (has_mozilla and has_platform):
+        if entropy > 3.8 and not (has_mozilla and has_platform):
             return 30.0, f"high_entropy_random_agent (entropy: {entropy})"
 
         if not has_mozilla and not has_platform:

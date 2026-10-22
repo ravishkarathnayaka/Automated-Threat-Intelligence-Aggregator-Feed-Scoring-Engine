@@ -1,5 +1,6 @@
 from cti_core.processors.asn_lookup import ASNReputationProcessor
 from cti_core.processors.asn_peer_evaluator import ASNPeerEvaluator
+from cti_core.processors.certificate_serial_normalizer import CertificateSerialNormalizer
 from cti_core.processors.cidr_filter import CIDRFilter
 from cti_core.processors.co_occurrence_clusterer import CoOccurrenceClusterer
 from cti_core.processors.cve_cvss_parser import CVSSParser
@@ -37,6 +38,7 @@ __all__ = [
     "normalize_indicator",
     "ASNReputationProcessor",
     "ASNPeerEvaluator",
+    "CertificateSerialNormalizer",
     "Deduplicator",
     "EmailSanitizer",
     "FaviconHashCalculator",

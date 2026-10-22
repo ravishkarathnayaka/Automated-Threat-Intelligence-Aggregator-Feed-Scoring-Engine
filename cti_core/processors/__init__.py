@@ -29,6 +29,7 @@ from cti_core.processors.tld_reputation import TLDReputationProcessor
 from cti_core.processors.tls_fingerprint import TLSFingerprintValidator
 from cti_core.processors.url_sanitizer import URLSanitizer
 from cti_core.processors.user_agent_parser import UserAgentValidator
+from cti_core.processors.user_agent_anomaly_detector import UserAgentAnomalyDetector
 from cti_core.processors.whitelist_filter import WhitelistFilter
 from cti_core.processors.whois_registrar_classifier import RegistrarClassifier
 
@@ -58,6 +59,7 @@ __all__ = [
     "TLSFingerprintValidator",
     "URLSanitizer",
     "UserAgentValidator",
+    "UserAgentAnomalyDetector",
     "HashValidator",
     "JA4FingerprintProcessor",
     "IPv6Normalizer",

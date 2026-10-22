@@ -11,6 +11,7 @@ from cti_core.exporters.firewall_blocklist import FirewallBlocklistExporter
 from cti_core.exporters.fortinet_exporter import FortinetExporter
 from cti_core.exporters.microsoft_sentinel_exporter import MicrosoftSentinelExporter
 from cti_core.exporters.misp_exporter import MISPExporter
+from cti_core.exporters.misp_feed_manifest_exporter import MISPFeedManifestExporter
 from cti_core.exporters.opendns_umbrella_exporter import OpenDNSUmbrellaExporter
 from cti_core.exporters.palo_alto_edl_exporter import PaloAltoEDLExporter
 from cti_core.exporters.pan_os_exporter import PanOSExporter
@@ -42,6 +43,7 @@ __all__ = [
     "DNSRPZExporter",
     "ElasticExporter",
     "MISPExporter",
+    "MISPFeedManifestExporter",
     "OpenDNSUmbrellaExporter",
     "PaloAltoEDLExporter",
     "RulesExporter",

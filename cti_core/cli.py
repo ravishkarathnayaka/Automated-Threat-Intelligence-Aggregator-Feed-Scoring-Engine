@@ -22,6 +22,7 @@ from cti_core.processors.ja4_fingerprint_processor import JA4FingerprintProcesso
 from cti_core.processors.normalizer import defang, identify_indicator_type, refang
 from cti_core.processors.punycode import PunycodeProcessor
 from cti_core.scoring.bayesian_scorer import BayesianScorer
+from cti_core.scoring.kalman_confidence_filter import KalmanConfidenceFilter
 from cti_core.scoring.markov_threat_state import MarkovThreatStateModel, ThreatState
 from cti_core.scoring.scoring_engine import global_scoring_engine
 
@@ -132,6 +133,11 @@ def build_parser() -> argparse.ArgumentParser:
     markov_p = subparsers.add_parser("markov", help="Simulate threat infrastructure state transitions using Markov chains")
     markov_p.add_argument("--state", type=str, default="active", choices=["dormant", "active", "monitored", "remediated"], help="Initial threat state")
     markov_p.add_argument("--steps", type=int, default=3, help="Number of steps to project forward")
+
+    # Command: kalman
+    kalman_p = subparsers.add_parser("kalman", help="Filter noisy feed observation scores using 1-D Kalman smoothing")
+    kalman_p.add_argument("scores", type=str, help="Comma-separated score sequence (e.g. 60,75,80,95)")
+    kalman_p.add_argument("--initial", type=float, default=50.0, help="Prior confidence score (default 50.0)")
 
     return parser
 
@@ -389,6 +395,19 @@ def main(args: Optional[List[str]] = None) -> int:
         }
         print(json.dumps(out, indent=2))
         return 0
+
+    elif parsed.command == "kalman":
+        score_list = [float(x.strip()) for x in parsed.scores.split(",") if x.strip()]
+        smoothed = KalmanConfidenceFilter.filter_batch(score_list, initial_score=parsed.initial)
+        out = {
+            "raw_observations": score_list,
+            "initial_confidence": parsed.initial,
+            "kalman_smoothed": smoothed,
+            "converged_confidence": smoothed[-1] if smoothed else parsed.initial,
+        }
+        print(json.dumps(out, indent=2))
+        return 0
+
 
 
 

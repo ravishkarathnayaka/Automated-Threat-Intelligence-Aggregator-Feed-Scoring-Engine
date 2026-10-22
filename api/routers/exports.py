@@ -18,6 +18,7 @@ from cti_core.exporters.firewall_blocklist import FirewallBlocklistExporter
 from cti_core.exporters.fortinet_exporter import FortinetExporter
 from cti_core.exporters.microsoft_sentinel_exporter import MicrosoftSentinelExporter
 from cti_core.exporters.misp_exporter import MISPExporter
+from cti_core.exporters.palo_alto_edl_exporter import PaloAltoEDLExporter
 from cti_core.exporters.rules_exporter import RulesExporter
 from cti_core.exporters.sentinelone_exporter import SentinelOneExporter
 from cti_core.exporters.sigma_exporter import SigmaExporter
@@ -644,6 +645,38 @@ async def export_splunk_csv(
         media_type="text/csv; charset=utf-8",
         headers={"Content-Disposition": 'inline; filename="splunk_threat_intel.csv"'},
     )
+
+
+@router.get(
+    "/palo-alto-edl.txt",
+    response_class=Response,
+    summary="Export Palo Alto PAN-OS External Dynamic List (EDL)",
+    description="Palo Alto PAN-OS compatible newline-separated External Dynamic List for IP blocking.",
+)
+async def export_palo_alto_edl(
+    min_score: float = Query(75.0, ge=0.0, le=100.0, description="Minimum confidence score threshold"),
+    session: AsyncSession = Depends(get_db_session),
+) -> Response:
+    """Stream Palo Alto EDL IP list."""
+    stmt = (
+        select(IndicatorModel)
+        .where(
+            IndicatorModel.type.in_(["ipv4", "ipv6"]),
+            IndicatorModel.is_whitelisted.is_(False),
+            IndicatorModel.confidence_score >= min_score,
+        )
+        .order_by(IndicatorModel.confidence_score.desc())
+    )
+    result = await session.execute(stmt)
+    indicators = result.scalars().all()
+
+    content = PaloAltoEDLExporter.export_ip_edl(indicators, min_score=min_score)
+    return Response(
+        content=content,
+        media_type="text/plain; charset=utf-8",
+        headers={"Content-Disposition": 'inline; filename="pan_os_edl.txt"'},
+    )
+
 
 
 

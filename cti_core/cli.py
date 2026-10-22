@@ -17,6 +17,7 @@ from cti_core.mock_data import get_synthetic_indicators
 from cti_core.processors.asn_lookup import ASNReputationProcessor
 from cti_core.processors.cidr_filter import CIDRFilter
 from cti_core.processors.dga_detector import DGADetector
+from cti_core.processors.ja4_fingerprint_processor import JA4FingerprintProcessor
 from cti_core.processors.normalizer import defang, identify_indicator_type, refang
 from cti_core.processors.punycode import PunycodeProcessor
 from cti_core.scoring.bayesian_scorer import BayesianScorer
@@ -116,6 +117,10 @@ def build_parser() -> argparse.ArgumentParser:
     bayes_p.add_argument("sources", type=str, help="Comma-separated reporting sources (e.g. virustotal,threatfox)")
     bayes_p.add_argument("--prior", type=float, default=0.15, help="Prior probability (default 0.15)")
     bayes_p.add_argument("--benign", type=int, default=0, help="Number of benign whitelist confirmations")
+
+    # Command: ja4
+    ja4_p = subparsers.add_parser("ja4", help="Evaluate Fox-IT JA4 TLS client fingerprint")
+    ja4_p.add_argument("fingerprint", type=str, help="JA4 fingerprint string (e.g. t13d1516h2_8daaf6152771_b7538a735178)")
 
     return parser
 
@@ -340,6 +345,19 @@ def main(args: Optional[List[str]] = None) -> int:
         }
         print(json.dumps(sim_out, indent=2))
         return 0
+
+    elif parsed.command == "ja4":
+        is_valid = JA4FingerprintProcessor.is_valid_ja4(parsed.fingerprint)
+        penalty, desc = JA4FingerprintProcessor.evaluate(parsed.fingerprint)
+        out = {
+            "fingerprint": parsed.fingerprint,
+            "is_valid": is_valid,
+            "penalty_score": penalty,
+            "classification": desc,
+        }
+        print(json.dumps(out, indent=2))
+        return 0
+
 
     return 0
 

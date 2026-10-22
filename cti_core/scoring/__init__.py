@@ -3,6 +3,7 @@ from cti_core.scoring.consensus import ConsensusScorer
 from cti_core.scoring.decay_curves import LogisticSigmoidDecayModel
 from cti_core.scoring.decay_models import HalfLifeDecayModel
 from cti_core.scoring.feed_reliability_tracker import FeedReliabilityTracker
+from cti_core.scoring.gini_feed_diversity import GiniFeedDiversity
 from cti_core.scoring.information_gain_evaluator import InformationGainEvaluator
 from cti_core.scoring.kalman_confidence_filter import KalmanConfidenceFilter
 from cti_core.scoring.markov_threat_state import MarkovThreatStateModel, ThreatState
@@ -22,6 +23,7 @@ __all__ = [
     "global_scoring_engine",
     "ConsensusScorer",
     "FeedReliabilityTracker",
+    "GiniFeedDiversity",
     "InformationGainEvaluator",
     "KalmanConfidenceFilter",
     "HalfLifeDecayModel",

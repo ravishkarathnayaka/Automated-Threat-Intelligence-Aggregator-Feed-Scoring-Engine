@@ -4,6 +4,7 @@ from cti_core.exporters.checkpoint_exporter import CheckPointExporter
 from cti_core.exporters.carbon_black_exporter import CarbonBlackExporter
 from cti_core.exporters.cloudflare_exporter import CloudflareWAFExporter
 from cti_core.exporters.crowdstrike_exporter import CrowdStrikeExporter
+from cti_core.exporters.crowdstrike_fdr_exporter import CrowdStrikeFDRExporter
 from cti_core.exporters.csv_exporter import CSVExporter
 from cti_core.exporters.dns_rpz_exporter import DNSRPZExporter
 from cti_core.exporters.elastic_exporter import ElasticExporter
@@ -35,6 +36,7 @@ __all__ = [
     "CarbonBlackExporter",
     "CloudflareWAFExporter",
     "CrowdStrikeExporter",
+    "CrowdStrikeFDRExporter",
     "CSVExporter",
     "STIXExporter",
     "FirewallBlocklistExporter",

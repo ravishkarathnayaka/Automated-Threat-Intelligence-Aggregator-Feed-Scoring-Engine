@@ -22,6 +22,7 @@ from cti_core.collectors.tor_nodes import TorExitNodesCollector
 from cti_core.collectors.tweetfeed import TweetFeedCollector
 from cti_core.collectors.urlhaus import URLhausCollector
 from cti_core.collectors.urlscan import URLScanCollector
+from cti_core.collectors.viriback_tracker_collector import ViriBackTrackerCollector
 from cti_core.collectors.vxvault import VXVaultCollector
 
 __all__ = [
@@ -32,6 +33,7 @@ __all__ = [
     "CINSArmyCollector",
     "URLhausCollector",
     "URLScanCollector",
+    "ViriBackTrackerCollector",
     "VXVaultCollector",
     "CISAKEVCollector",
     "DataplaneCollector",

@@ -22,6 +22,7 @@ from cti_core.exporters.palo_alto_edl_exporter import PaloAltoEDLExporter
 from cti_core.exporters.rules_exporter import RulesExporter
 from cti_core.exporters.sentinelone_exporter import SentinelOneExporter
 from cti_core.exporters.sigma_exporter import SigmaExporter
+from cti_core.exporters.snort3_exporter import Snort3Exporter
 from cti_core.exporters.splunk_lookup_exporter import SplunkLookupExporter
 from cti_core.exporters.stix_exporter import STIXExporter
 from cti_core.exporters.tanium_exporter import TaniumExporter
@@ -708,6 +709,37 @@ async def export_tanium_package(
         media_type="application/json; charset=utf-8",
         headers={"Content-Disposition": f'inline; filename="{package_name}.json"'},
     )
+
+
+@router.get(
+    "/snort3.rules",
+    response_class=Response,
+    summary="Export Snort 3 Modern IPS Ruleset",
+    description="Modern Snort 3 syntax rule definitions for inline automated threat rejection.",
+)
+async def export_snort3_rules(
+    min_score: float = Query(75.0, ge=0.0, le=100.0, description="Minimum confidence score threshold"),
+    session: AsyncSession = Depends(get_db_session),
+) -> Response:
+    """Stream Snort 3 modern IPS rules."""
+    stmt = (
+        select(IndicatorModel)
+        .where(
+            IndicatorModel.is_whitelisted.is_(False),
+            IndicatorModel.confidence_score >= min_score,
+        )
+        .order_by(IndicatorModel.confidence_score.desc())
+    )
+    result = await session.execute(stmt)
+    indicators = result.scalars().all()
+
+    rules = Snort3Exporter.export_rules(indicators, min_score=min_score)
+    return Response(
+        content=rules,
+        media_type="text/plain; charset=utf-8",
+        headers={"Content-Disposition": 'inline; filename="snort3_sentinel.rules"'},
+    )
+
 
 
 

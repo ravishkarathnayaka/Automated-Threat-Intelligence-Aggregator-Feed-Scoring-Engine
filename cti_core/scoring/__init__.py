@@ -4,6 +4,7 @@ from cti_core.scoring.decay_curves import LogisticSigmoidDecayModel
 from cti_core.scoring.decay_models import HalfLifeDecayModel
 from cti_core.scoring.feed_reliability_tracker import FeedReliabilityTracker
 from cti_core.scoring.information_gain_evaluator import InformationGainEvaluator
+from cti_core.scoring.kalman_confidence_filter import KalmanConfidenceFilter
 from cti_core.scoring.markov_threat_state import MarkovThreatStateModel, ThreatState
 from cti_core.scoring.reputation_tiers import HysteresisTierEvaluator
 from cti_core.scoring.scoring_engine import (
@@ -22,6 +23,7 @@ __all__ = [
     "ConsensusScorer",
     "FeedReliabilityTracker",
     "InformationGainEvaluator",
+    "KalmanConfidenceFilter",
     "HalfLifeDecayModel",
     "LogisticSigmoidDecayModel",
     "MarkovThreatStateModel",

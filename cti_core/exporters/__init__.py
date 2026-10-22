@@ -17,6 +17,7 @@ from cti_core.exporters.qradar_exporter import QRadarExporter
 from cti_core.exporters.rules_exporter import RulesExporter
 from cti_core.exporters.sigma_exporter import SigmaExporter
 from cti_core.exporters.sentinelone_exporter import SentinelOneExporter
+from cti_core.exporters.splunk_lookup_exporter import SplunkLookupExporter
 from cti_core.exporters.stix_exporter import STIXExporter
 from cti_core.exporters.suricata_eve_exporter import SuricataEVEExporter
 from cti_core.exporters.wazuh_exporter import WazuhExporter
@@ -48,4 +49,5 @@ __all__ = [
     "ZeekIntelExporter",
     "PanOSExporter",
     "QRadarExporter",
+    "SplunkLookupExporter",
 ]

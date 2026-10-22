@@ -8,6 +8,7 @@ from cti_core.processors.deduplicator import Deduplicator
 from cti_core.processors.email_address_sanitizer import EmailSanitizer
 from cti_core.processors.favicon_hash_calculator import FaviconHashCalculator
 from cti_core.processors.dga_detector import DGADetector
+from cti_core.processors.dga_ngram_classifier import DGANgramClassifier
 from cti_core.processors.geo_reputation import GeoReputationProcessor
 from cti_core.processors.hash_validator import HashValidator
 from cti_core.processors.ipv6_normalizer import IPv6Normalizer
@@ -43,6 +44,7 @@ __all__ = [
     "EmailSanitizer",
     "FaviconHashCalculator",
     "DGADetector",
+    "DGANgramClassifier",
     "GeoReputationProcessor",
     "WhitelistFilter",
     "RegistrarClassifier",

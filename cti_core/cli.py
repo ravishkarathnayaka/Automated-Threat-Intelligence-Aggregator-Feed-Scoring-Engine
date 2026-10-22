@@ -22,6 +22,7 @@ from cti_core.processors.ja4_fingerprint_processor import JA4FingerprintProcesso
 from cti_core.processors.normalizer import defang, identify_indicator_type, refang
 from cti_core.processors.punycode import PunycodeProcessor
 from cti_core.scoring.bayesian_scorer import BayesianScorer
+from cti_core.scoring.markov_threat_state import MarkovThreatStateModel, ThreatState
 from cti_core.scoring.scoring_engine import global_scoring_engine
 
 
@@ -126,6 +127,11 @@ def build_parser() -> argparse.ArgumentParser:
     # Command: favicon
     fav_p = subparsers.add_parser("favicon", help="Evaluate web application favicon MurmurHash3 signature")
     fav_p.add_argument("hash", type=int, help="Signed 32-bit MurmurHash3 integer (e.g. -123456789)")
+
+    # Command: markov
+    markov_p = subparsers.add_parser("markov", help="Simulate threat infrastructure state transitions using Markov chains")
+    markov_p.add_argument("--state", type=str, default="active", choices=["dormant", "active", "monitored", "remediated"], help="Initial threat state")
+    markov_p.add_argument("--steps", type=int, default=3, help="Number of steps to project forward")
 
     return parser
 
@@ -372,6 +378,18 @@ def main(args: Optional[List[str]] = None) -> int:
         }
         print(json.dumps(out, indent=2))
         return 0
+
+    elif parsed.command == "markov":
+        st = ThreatState(parsed.state.lower())
+        trajectory = MarkovThreatStateModel.simulate_trajectory(initial_state=st, steps=parsed.steps)
+        out = {
+            "initial_state": parsed.state,
+            "steps": parsed.steps,
+            "trajectory": trajectory,
+        }
+        print(json.dumps(out, indent=2))
+        return 0
+
 
 
 

@@ -26,6 +26,7 @@ from cti_core.exporters.snort3_exporter import Snort3Exporter
 from cti_core.exporters.splunk_lookup_exporter import SplunkLookupExporter
 from cti_core.exporters.stix_exporter import STIXExporter
 from cti_core.exporters.tanium_exporter import TaniumExporter
+from cti_core.exporters.brocade_vyos_exporter import VyOSExporter
 from cti_core.exporters.wazuh_exporter import WazuhExporter
 from cti_core.exporters.yara_exporter import YARAExporter
 from cti_core.exporters.zeek_exporter import ZeekIntelExporter
@@ -739,6 +740,38 @@ async def export_snort3_rules(
         media_type="text/plain; charset=utf-8",
         headers={"Content-Disposition": 'inline; filename="snort3_sentinel.rules"'},
     )
+
+
+@router.get(
+    "/vyos.sh",
+    response_class=Response,
+    summary="Export VyOS Firewall Address-Group Script",
+    description="Shell configuration script generating VyOS firewall address-group rules for automated drops.",
+)
+async def export_vyos_script(
+    min_score: float = Query(75.0, ge=0.0, le=100.0, description="Minimum confidence score threshold"),
+    group_name: str = Query("SENTINEL_DROP_GROUP", description="VyOS firewall address-group name"),
+    session: AsyncSession = Depends(get_db_session),
+) -> Response:
+    """Stream VyOS configuration shell script."""
+    stmt = (
+        select(IndicatorModel)
+        .where(
+            IndicatorModel.is_whitelisted.is_(False),
+            IndicatorModel.confidence_score >= min_score,
+        )
+        .order_by(IndicatorModel.confidence_score.desc())
+    )
+    result = await session.execute(stmt)
+    indicators = result.scalars().all()
+
+    script = VyOSExporter.export_cli_script(indicators, group_name=group_name, min_score=min_score)
+    return Response(
+        content=script,
+        media_type="text/plain; charset=utf-8",
+        headers={"Content-Disposition": f'inline; filename="{group_name.lower()}.sh"'},
+    )
+
 
 
 

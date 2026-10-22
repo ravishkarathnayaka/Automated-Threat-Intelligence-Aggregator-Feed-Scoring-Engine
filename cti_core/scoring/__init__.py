@@ -13,6 +13,7 @@ from cti_core.scoring.scoring_engine import (
     global_scoring_engine,
 )
 from cti_core.scoring.tenant_profiles import TenantProfile, TenantProfileManager
+from cti_core.scoring.weibull_reliability_model import WeibullReliabilityModel
 
 __all__ = [
     "BayesianScorer",
@@ -28,6 +29,7 @@ __all__ = [
     "HysteresisTierEvaluator",
     "TenantProfile",
     "TenantProfileManager",
+    "WeibullReliabilityModel",
     "SOURCE_RELIABILITY_WEIGHTS",
     "DECAY_LAMBDA",
 ]

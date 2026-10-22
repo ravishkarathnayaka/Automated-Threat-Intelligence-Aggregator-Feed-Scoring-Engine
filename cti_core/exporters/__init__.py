@@ -17,6 +17,7 @@ from cti_core.exporters.pan_os_exporter import PanOSExporter
 from cti_core.exporters.qradar_exporter import QRadarExporter
 from cti_core.exporters.rules_exporter import RulesExporter
 from cti_core.exporters.sigma_exporter import SigmaExporter
+from cti_core.exporters.snort3_exporter import Snort3Exporter
 from cti_core.exporters.sentinelone_exporter import SentinelOneExporter
 from cti_core.exporters.splunk_lookup_exporter import SplunkLookupExporter
 from cti_core.exporters.stix_exporter import STIXExporter
@@ -45,6 +46,7 @@ __all__ = [
     "PaloAltoEDLExporter",
     "RulesExporter",
     "SigmaExporter",
+    "Snort3Exporter",
     "SentinelOneExporter",
     "SuricataEVEExporter",
     "WazuhExporter",

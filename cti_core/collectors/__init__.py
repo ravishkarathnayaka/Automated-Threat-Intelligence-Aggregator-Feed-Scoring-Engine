@@ -9,6 +9,7 @@ from cti_core.collectors.feodo_tracker import FeodoTrackerCollector
 from cti_core.collectors.greensnow import GreenSnowCollector
 from cti_core.collectors.greynoise import GreyNoiseCollector
 from cti_core.collectors.inversion_dnsbl_collector import InversionDNSBLCollector
+from cti_core.collectors.malware_bazaar_collector import MalwareBazaarCollector
 from cti_core.collectors.openphish import OpenPhishCollector
 from cti_core.collectors.otx_collector import OTXCollector
 from cti_core.collectors.phishtank import PhishTankCollector
@@ -37,6 +38,7 @@ __all__ = [
     "GreenSnowCollector",
     "GreyNoiseCollector",
     "InversionDNSBLCollector",
+    "MalwareBazaarCollector",
     "OpenPhishCollector",
     "OTXCollector",
     "PhishTankCollector",

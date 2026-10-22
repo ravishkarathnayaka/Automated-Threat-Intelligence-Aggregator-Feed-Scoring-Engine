@@ -17,6 +17,7 @@ from cti_core.collectors.phishtank import PhishTankCollector
 from cti_core.collectors.rutgers_bad_hosts_collector import RutgersBadHostsCollector
 from cti_core.collectors.spamhaus_drop import SpamhausDROPCollector
 from cti_core.collectors.sslbl import SSLBLCollector
+from cti_core.collectors.sslbl_botnet_collector import SSLBLBotnetCollector
 from cti_core.collectors.threatfox import ThreatFoxCollector
 from cti_core.collectors.threatview_io_collector import ThreatViewIOCollector
 from cti_core.collectors.tor_nodes import TorExitNodesCollector
@@ -50,6 +51,7 @@ __all__ = [
     "RutgersBadHostsCollector",
     "SpamhausDROPCollector",
     "SSLBLCollector",
+    "SSLBLBotnetCollector",
     "ThreatFoxCollector",
     "ThreatViewIOCollector",
     "TorExitNodesCollector",

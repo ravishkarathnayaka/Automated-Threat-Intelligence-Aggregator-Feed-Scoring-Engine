@@ -21,6 +21,7 @@ from cti_core.exporters.misp_exporter import MISPExporter
 from cti_core.exporters.rules_exporter import RulesExporter
 from cti_core.exporters.sentinelone_exporter import SentinelOneExporter
 from cti_core.exporters.sigma_exporter import SigmaExporter
+from cti_core.exporters.splunk_lookup_exporter import SplunkLookupExporter
 from cti_core.exporters.stix_exporter import STIXExporter
 from cti_core.exporters.wazuh_exporter import WazuhExporter
 from cti_core.exporters.yara_exporter import YARAExporter
@@ -613,6 +614,37 @@ async def export_crowdstrike_csv(
         media_type="text/csv; charset=utf-8",
         headers={"Content-Disposition": 'inline; filename="crowdstrike_iocs.csv"'},
     )
+
+
+@router.get(
+    "/splunk.csv",
+    response_class=Response,
+    summary="Export Splunk ES Threat Intelligence Lookup Table",
+    description="Splunk Enterprise Security compliant CSV lookup table with threat keys and weights.",
+)
+async def export_splunk_csv(
+    min_score: float = Query(65.0, ge=0.0, le=100.0, description="Minimum confidence score threshold"),
+    session: AsyncSession = Depends(get_db_session),
+) -> Response:
+    """Stream Splunk Enterprise Security threat lookup CSV."""
+    stmt = (
+        select(IndicatorModel)
+        .where(
+            IndicatorModel.is_whitelisted.is_(False),
+            IndicatorModel.confidence_score >= min_score,
+        )
+        .order_by(IndicatorModel.confidence_score.desc())
+    )
+    result = await session.execute(stmt)
+    indicators = result.scalars().all()
+
+    csv_data = SplunkLookupExporter.export_csv(indicators, min_score=min_score)
+    return Response(
+        content=csv_data,
+        media_type="text/csv; charset=utf-8",
+        headers={"Content-Disposition": 'inline; filename="splunk_threat_intel.csv"'},
+    )
+
 
 
 

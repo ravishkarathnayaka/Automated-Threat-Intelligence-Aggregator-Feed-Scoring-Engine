@@ -28,6 +28,7 @@ from cti_core.exporters.tanium_exporter import TaniumExporter
 from cti_core.exporters.wazuh_exporter import WazuhExporter
 from cti_core.exporters.yara_exporter import YARAExporter
 from cti_core.exporters.zeek_exporter import ZeekIntelExporter
+from cti_core.exporters.bro_notice_exporter import ZeekNoticeExporter
 
 __all__ = [
     "AWSNetworkFirewallExporter",
@@ -56,6 +57,7 @@ __all__ = [
     "WazuhExporter",
     "YARAExporter",
     "ZeekIntelExporter",
+    "ZeekNoticeExporter",
     "PanOSExporter",
     "QRadarExporter",
     "SplunkLookupExporter",

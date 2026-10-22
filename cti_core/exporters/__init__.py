@@ -25,6 +25,7 @@ from cti_core.exporters.splunk_lookup_exporter import SplunkLookupExporter
 from cti_core.exporters.stix_exporter import STIXExporter
 from cti_core.exporters.suricata_eve_exporter import SuricataEVEExporter
 from cti_core.exporters.tanium_exporter import TaniumExporter
+from cti_core.exporters.brocade_vyos_exporter import VyOSExporter
 from cti_core.exporters.wazuh_exporter import WazuhExporter
 from cti_core.exporters.yara_exporter import YARAExporter
 from cti_core.exporters.zeek_exporter import ZeekIntelExporter
@@ -62,4 +63,5 @@ __all__ = [
     "QRadarExporter",
     "SplunkLookupExporter",
     "TaniumExporter",
+    "VyOSExporter",
 ]

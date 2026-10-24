@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from cti_core.database import get_db_session
 from cti_core.exporters.aws_network_firewall_exporter import AWSNetworkFirewallExporter
 from cti_core.exporters.checkpoint_exporter import CheckPointExporter
+from cti_core.exporters.cisco_firepower_exporter import CiscoFirepowerExporter
 from cti_core.exporters.cloudflare_exporter import CloudflareWAFExporter
 from cti_core.exporters.crowdstrike_exporter import CrowdStrikeExporter
 from cti_core.exporters.csv_exporter import CSVExporter
@@ -771,6 +772,37 @@ async def export_vyos_script(
         media_type="text/plain; charset=utf-8",
         headers={"Content-Disposition": f'inline; filename="{group_name.lower()}.sh"'},
     )
+
+
+@router.get(
+    "/cisco-firepower.json",
+    response_class=Response,
+    summary="Export Cisco Firepower FMC Network Objects JSON",
+    description="Bulk Network and Host Objects JSON formatted for Cisco Firepower Management Center (FMC) REST API.",
+)
+async def export_cisco_firepower(
+    min_score: float = Query(75.0, ge=0.0, le=100.0, description="Minimum confidence score threshold"),
+    session: AsyncSession = Depends(get_db_session),
+) -> Response:
+    """Stream Cisco Firepower FMC Network Objects payload."""
+    stmt = (
+        select(IndicatorModel)
+        .where(
+            IndicatorModel.is_whitelisted.is_(False),
+            IndicatorModel.confidence_score >= min_score,
+        )
+        .order_by(IndicatorModel.confidence_score.desc())
+    )
+    result = await session.execute(stmt)
+    indicators = result.scalars().all()
+
+    content = CiscoFirepowerExporter.export_fmc_objects(indicators, min_score=min_score)
+    return Response(
+        content=content,
+        media_type="application/json; charset=utf-8",
+        headers={"Content-Disposition": 'inline; filename="cisco_firepower_objects.json"'},
+    )
+
 
 
 

@@ -34,3 +34,13 @@ async def test_juniper_srx_export_api():
         assert "text/plain" in res.headers["content-type"]
         assert "set security zones security-zone untrust address-book" in res.text
 
+
+@pytest.mark.asyncio
+async def test_k8s_policy_export_api():
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        res = await client.get("/api/v1/export/k8s-policy.yaml?min_score=50")
+        assert res.status_code == 200
+        assert "kind: NetworkPolicy" in res.text
+        assert "policyTypes:" in res.text
+
+

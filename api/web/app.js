@@ -822,6 +822,35 @@ level: high`;
     return lines.join("\n");
   }
 
+  if (format === "cisco") {
+    const objs = highIocs.map(i => ({
+      name: `SENTINEL_${i.type.toUpperCase()}_${i.normalized_value.replace(/[^a-zA-Z0-9]/g, '_')}`,
+      type: i.type === "domain" ? "FQDN" : "Host",
+      value: i.normalized_value,
+      description: `SENTINEL-CTI confidence: ${i.confidence_score}`
+    }));
+    return JSON.stringify({ version: "1.0", networkObjects: objs, totalCount: objs.length }, null, 2);
+  }
+
+  if (format === "juniper") {
+    const cmds = ["# Junos SRX Threat Drop Configuration", "set security zones security-zone untrust address-book address-set SENTINEL_BLOCK_SET"];
+    highIocs.forEach(i => {
+      const name = `THREAT_${i.normalized_value.replace(/[^a-zA-Z0-9]/g, '_')}`;
+      if (i.type === "ipv4") {
+        cmds.push(`set security zones security-zone untrust address-book address ${name} ${i.normalized_value}/32`);
+      } else if (i.type === "domain") {
+        cmds.push(`set security zones security-zone untrust address-book address ${name} dns-name ${i.normalized_value}`);
+      }
+      cmds.push(`set security zones security-zone untrust address-book address-set SENTINEL_BLOCK_SET address ${name}`);
+    });
+    return cmds.join("\n");
+  }
+
+  if (format === "k8s") {
+    const cidrs = highIocs.filter(i => i.type === "ipv4").map(i => `        - ${i.normalized_value}/32`);
+    return `apiVersion: networking.k8s.io/v1\nkind: NetworkPolicy\nmetadata:\n  name: sentinel-block-threat-egress\n  namespace: default\nspec:\n  podSelector: {}\n  policyTypes:\n  - Egress\n  egress:\n  - to:\n    - ipBlock:\n        cidr: 0.0.0.0/0\n        except:\n${cidrs.join('\n')}`;
+  }
+
   return "";
 }
 
@@ -852,7 +881,10 @@ function downloadExport(format) {
     splunk: "csv",
     tanium: "json",
     "palo-alto-edl": "txt",
-    snort3: "rules"
+    snort3: "rules",
+    cisco: "json",
+    juniper: "set",
+    k8s: "yaml"
   };
   const ext = extMap[format] || "txt";
   const filename = `threat_intel_${format}.${ext}`;

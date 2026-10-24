@@ -17,6 +17,7 @@ from cti_core.models.indicator import (
     SourceMetadata,
 )
 from cti_core.pipeline import CTIPipeline, global_pipeline
+from cti_core.scoring.beta_distribution_scorer import BetaDistributionScorer
 from cti_core.scoring.kalman_confidence_filter import KalmanConfidenceFilter
 from cti_core.scoring.markov_threat_state import MarkovThreatStateModel, ThreatState
 from cti_core.scoring.weibull_reliability_model import WeibullReliabilityModel
@@ -383,4 +384,37 @@ async def simulate_scoring(payload: SimulationRequest) -> SimulationResponse:
         kalman_variance=var,
         markov_next_probabilities=str_probs,
     )
+
+
+class BetaScoringRequest(BaseModel):
+    malicious_count: int = Field(5, ge=0, description="Count of corroborating malicious reports")
+    benign_count: int = Field(0, ge=0, description="Count of benign/whitelist counter-evidence reports")
+    prior_alpha: float = Field(1.0, ge=0.1, description="Prior Beta alpha parameter")
+    prior_beta: float = Field(4.0, ge=0.1, description="Prior Beta beta parameter")
+
+
+class BetaScoringResponse(BaseModel):
+    alpha: float
+    beta: float
+    posterior_probability: float
+    epistemic_variance: float
+    confidence_score: float
+
+
+@router.post(
+    "/scoring/beta-distribution",
+    response_model=BetaScoringResponse,
+    summary="Compute Beta-Binomial Bayesian Threat Confidence",
+    description="Calculate exact posterior mean and epistemic variance from evidence counts.",
+)
+async def compute_beta_distribution(payload: BetaScoringRequest) -> BetaScoringResponse:
+    """Calculate conjugate Beta posterior threat score."""
+    res = BetaDistributionScorer.calculate_score(
+        malicious_count=payload.malicious_count,
+        benign_count=payload.benign_count,
+        prior_alpha=payload.prior_alpha,
+        prior_beta=payload.prior_beta,
+    )
+    return BetaScoringResponse(**res)
+
 

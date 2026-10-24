@@ -17,6 +17,7 @@ from cti_core.mock_data import get_synthetic_indicators
 from cti_core.processors.asn_lookup import ASNReputationProcessor
 from cti_core.processors.cidr_filter import CIDRFilter
 from cti_core.processors.dga_detector import DGADetector
+from cti_core.processors.domain_typosquat_evaluator import DomainTyposquatEvaluator
 from cti_core.processors.favicon_hash_calculator import FaviconHashCalculator
 from cti_core.processors.ja4_fingerprint_processor import JA4FingerprintProcessor
 from cti_core.processors.normalizer import defang, identify_indicator_type, refang
@@ -143,6 +144,10 @@ def build_parser() -> argparse.ArgumentParser:
     kalman_p = subparsers.add_parser("kalman", help="Filter noisy feed observation scores using 1-D Kalman smoothing")
     kalman_p.add_argument("scores", type=str, help="Comma-separated score sequence (e.g. 60,75,80,95)")
     kalman_p.add_argument("--initial", type=float, default=50.0, help="Prior confidence score (default 50.0)")
+
+    # Command: typosquat
+    typo_p = subparsers.add_parser("typosquat", help="Evaluate domain for brand typosquatting distance")
+    typo_p.add_argument("domain", type=str, help="Domain string (e.g. paypaal.com)")
 
     return parser
 
@@ -461,6 +466,18 @@ def main(args: Optional[List[str]] = None) -> int:
         }
         print(json.dumps(diag, indent=2))
         return 0
+
+    elif parsed.command == "typosquat":
+        is_squat, penalty, brand = DomainTyposquatEvaluator.evaluate(parsed.domain)
+        out = {
+            "domain": parsed.domain,
+            "is_typosquat": is_squat,
+            "risk_penalty": penalty,
+            "targeted_brand": brand,
+        }
+        print(json.dumps(out, indent=2))
+        return 0
+
 
 
 

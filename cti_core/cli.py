@@ -24,6 +24,7 @@ from cti_core.processors.ja4_fingerprint_processor import JA4FingerprintProcesso
 from cti_core.processors.normalizer import defang, identify_indicator_type, refang
 from cti_core.processors.punycode import PunycodeProcessor
 from cti_core.scoring.bayesian_scorer import BayesianScorer
+from cti_core.scoring.beta_distribution_scorer import BetaDistributionScorer
 from cti_core.scoring.kalman_confidence_filter import KalmanConfidenceFilter
 from cti_core.scoring.markov_threat_state import MarkovThreatStateModel, ThreatState
 from cti_core.scoring.pagerank_threat_graph import PageRankThreatGraph
@@ -158,6 +159,13 @@ def build_parser() -> argparse.ArgumentParser:
     # Command: hassh
     hassh_p = subparsers.add_parser("hassh", help="Evaluate SSH client/server HASSH network fingerprint")
     hassh_p.add_argument("fingerprint", type=str, help="32-char hexadecimal HASSH fingerprint")
+
+    # Command: beta-score
+    beta_p = subparsers.add_parser("beta-score", help="Compute Beta-Binomial conjugate Bayesian posterior confidence")
+    beta_p.add_argument("--malicious", type=int, default=5, help="Count of corroborating malicious reports")
+    beta_p.add_argument("--benign", type=int, default=0, help="Count of benign/whitelist counter-evidence reports")
+    beta_p.add_argument("--prior-alpha", type=float, default=1.0, help="Prior alpha (default 1.0)")
+    beta_p.add_argument("--prior-beta", type=float, default=4.0, help="Prior beta (default 4.0)")
 
     return parser
 
@@ -512,6 +520,16 @@ def main(args: Optional[List[str]] = None) -> int:
             "classification": desc,
         }
         print(json.dumps(out, indent=2))
+        return 0
+
+    elif parsed.command == "beta-score":
+        res = BetaDistributionScorer.calculate_score(
+            malicious_count=parsed.malicious,
+            benign_count=parsed.benign,
+            prior_alpha=parsed.prior_alpha,
+            prior_beta=parsed.prior_beta,
+        )
+        print(json.dumps(res, indent=2))
         return 0
 
 

@@ -20,6 +20,7 @@ from cti_core.pipeline import CTIPipeline, global_pipeline
 from cti_core.scoring.beta_distribution_scorer import BetaDistributionScorer
 from cti_core.scoring.kalman_confidence_filter import KalmanConfidenceFilter
 from cti_core.scoring.markov_threat_state import MarkovThreatStateModel, ThreatState
+from cti_core.scoring.pagerank_threat_graph import PageRankThreatGraph
 from cti_core.scoring.weibull_reliability_model import WeibullReliabilityModel
 
 router = APIRouter(prefix="/api/v1", tags=["Indicators"])
@@ -416,5 +417,37 @@ async def compute_beta_distribution(payload: BetaScoringRequest) -> BetaScoringR
         prior_beta=payload.prior_beta,
     )
     return BetaScoringResponse(**res)
+
+
+class PageRankRequest(BaseModel):
+    edges: List[List[str]] = Field(
+        default_factory=lambda: [["198.51.100.1", "c2-domain.com"], ["198.51.100.1", "apt-hash"]],
+        description="Graph edges representing co-occurrence [[source, target], ...]",
+    )
+    damping: float = Field(0.85, ge=0.1, le=0.99)
+
+
+class PageRankResponse(BaseModel):
+    rankings: Dict[str, float]
+    node_count: int
+    edge_count: int
+
+
+@router.post(
+    "/scoring/pagerank",
+    response_model=PageRankResponse,
+    summary="Compute Threat Graph PageRank Centrality",
+    description="Calculate eigenvector centrality and hub influence across indicator co-occurrence edges.",
+)
+async def compute_pagerank(payload: PageRankRequest) -> PageRankResponse:
+    """Calculate PageRank graph centrality."""
+    edge_tuples = [(e[0], e[1]) for e in payload.edges if len(e) >= 2]
+    ranks = PageRankThreatGraph.compute_pagerank(edge_tuples, damping=payload.damping)
+    return PageRankResponse(
+        rankings=ranks,
+        node_count=len(ranks),
+        edge_count=len(edge_tuples),
+    )
+
 
 

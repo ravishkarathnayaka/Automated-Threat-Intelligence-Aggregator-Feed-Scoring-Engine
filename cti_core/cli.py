@@ -38,7 +38,7 @@ BANNER = r"""
  \___ \|  _| |  \| | | |  | ||  \| |  _| | |       | |     | |  | | 
   ___) | |___| |\  | | |  | || |\  | |___| |___ ___| |___  | |  | | 
  |____/|_____|_| \_| |_| |___|_| \_|_____|_____|_____\____| |_| |___|
- Automated Threat Intelligence Aggregator & Feed Scoring Engine v2.4.0
+ Automated Threat Intelligence Aggregator & Feed Scoring Engine v3.0.0
 ======================================================================
 """
 
@@ -49,7 +49,7 @@ def build_parser() -> argparse.ArgumentParser:
         prog="cti-cli",
         description="SENTINEL CTI - Threat Intelligence & Feed Scoring Engine CLI Utility",
     )
-    parser.add_argument("--version", action="version", version="SENTINEL CTI Engine v2.4.0")
+    parser.add_argument("--version", action="version", version="SENTINEL CTI Engine v3.0.0")
     parser.add_argument("--banner", action="store_true", help="Print ASCII header banner")
     subparsers = parser.add_subparsers(dest="command", help="Available subcommands")
 

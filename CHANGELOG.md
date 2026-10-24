@@ -7,6 +7,57 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.0.0] - 2026-10-24
+
+### Added
+- **Next-Gen Enterprise Firewalls & Cloud-Native Exporters**:
+  - CiscoFirepowerExporter: Cisco Firepower Management Center (FMC) Host & Network Object JSON generator (/api/v1/export/cisco-firepower.json).
+  - JuniperSRXExporter: Juniper Junos SRX dynamic address-book and address-set CLI generator (/api/v1/export/juniper-srx.set).
+  - SonicWallExporter: SonicWall SonicOS Address Object and Group configuration generator.
+  - AristaEOSExporter: Arista EOS IP access-list drop rule configuration exporter.
+  - F5BigIPExporter: F5 BIG-IP AFM IP intelligence internal data-group TMSH generator.
+  - ModSecurityWAFExporter: OWASP ModSecurity Core Rule Set (CRS) SecRule enforcement generator.
+  - K8sNetworkPolicyExporter: Kubernetes NetworkPolicy egress restriction manifest exporter (/api/v1/export/k8s-policy.yaml).
+
+- **Advanced Threat Telemetry Collectors**:
+  - AlienVaultOTXCollector: AlienVault Open Threat Exchange (OTX) pulse indicator collector.
+  - PaloAltoUnit42Collector: Palo Alto Networks Unit 42 research playbook and threat actor indicator collector.
+  - CryptojackingPoolCollector: Illicit Monero mining pool and stratum endpoint blocklist collector.
+  - RansomwareTrackerCollector: Active ransomware C2 payment and extortion portal collector.
+  - TorExitNodeCollector: Official Tor Project exit consensus relay collector.
+  - PhishuntCollector: Phishunt.io suspicious credential phishing URL and domain collector.
+  - CertStreamCollector: Certificate Transparency (CT) log SSL/TLS certificate brand spoof collector.
+
+- **High-Performance Threat Processors**:
+  - JA3SFingerprintProcessor: TLS Server Hello JA3S cryptographic fingerprint classifier.
+  - HasshSSHProcessor: SSH client and server HASSH network fingerprint analyzer.
+  - DomainTyposquatEvaluator: Levenshtein edit distance typosquatting and brand impersonation evaluator.
+  - IPv6EUI64Extractor: SLAAC modified EUI-64 embedded physical MAC address and OUI extractor.
+  - HTTPHeaderEntropyEvaluator: HTTP response header ordering, entropy, and C2 fingerprint evaluator.
+  - BGPCommunityRiskEvaluator: BGP route community attribute and blackhole signaling risk evaluator.
+  - PayloadEntropyEvaluator: Binary payload Shannon entropy and Chi-square packing detector.
+
+- **Stochastic Scoring & Graph Models**:
+  - BetaDistributionScorer: Conjugate Beta-Binomial Bayesian confidence and epistemic variance model (/api/v1/scoring/beta-distribution).
+  - PageRankThreatGraph: Random-walk PageRank indicator influence in infrastructure co-occurrence graph (/api/v1/scoring/pagerank).
+  - ParetoDecayModel: Heavy-tailed Pareto power-law decay model for persistent APT infrastructure.
+  - AnomalyZScoreDetector: Rolling Z-score anomaly detector for feed volumetric surges.
+  - EMASmoother: Dual-window Exponential Moving Average confidence and volatility smoother.
+  - CosineSimilarityClusterer: Multi-hot vector cosine similarity clusterer for APT campaign attribution.
+  - JaccardOverlapTracker: Multi-feed pairwise Jaccard similarity tracker for vendor redundancy.
+
+- **CLI & Web Portal Enhancements**:
+  - CLI subcommands: 	yposquat, pagerank, hassh, eta-score.
+  - Portal UI export cards and client preview handlers for Cisco Firepower, Juniper SRX, and Kubernetes.
+  - Comprehensive architectural guides: docs/STOCHASTIC_GRAPH_MODELS_V3.md and docs/CLOUD_NATIVE_ENFORCEMENT_GUIDE.md.
+
+### Changed
+- Promoted engine version to v3.0.0.
+- Synchronized web portal static assets to FastAPI backend distribution directory.
+- Test suite expanded to 287 passing tests with 100% pass rate.
+
+
+
 ## [2.5.0] - 2026-10-22
 
 ### Added

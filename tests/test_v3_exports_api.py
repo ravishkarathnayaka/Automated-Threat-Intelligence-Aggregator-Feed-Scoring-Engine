@@ -24,3 +24,13 @@ async def test_cisco_firepower_export_api():
         data = res.json()
         assert "networkObjects" in data
         assert data["generator"] == "SENTINEL-CTI-Engine"
+
+
+@pytest.mark.asyncio
+async def test_juniper_srx_export_api():
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        res = await client.get("/api/v1/export/juniper-srx.set?min_score=50")
+        assert res.status_code == 200
+        assert "text/plain" in res.headers["content-type"]
+        assert "set security zones security-zone untrust address-book" in res.text
+

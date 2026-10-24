@@ -586,6 +586,57 @@
           </div>
         </div>
 
+        <!-- Export 19: Cisco Firepower FMC Objects -->
+        <div class="export-card">
+          <div>
+            <div class="export-top">
+              <div class="export-title">Cisco Firepower FMC</div>
+              <span class="export-format">cisco-firepower.json</span>
+            </div>
+            <p class="export-desc">
+              Cisco Firepower Management Center (FMC) REST API host and network object payload for bulk deployment.
+            </p>
+          </div>
+          <div class="export-actions">
+            <button class="nav-btn nav-btn-secondary" onclick="previewExport('cisco')">View Preview</button>
+            <button class="nav-btn nav-btn-amber" onclick="downloadExport('cisco')">Download .json</button>
+          </div>
+        </div>
+
+        <!-- Export 20: Juniper Junos SRX Address Book -->
+        <div class="export-card">
+          <div>
+            <div class="export-top">
+              <div class="export-title">Juniper Junos SRX</div>
+              <span class="export-format">juniper-srx.set</span>
+            </div>
+            <p class="export-desc">
+              Junos SRX set commands defining untrusted perimeter address-book objects and automated drop sets.
+            </p>
+          </div>
+          <div class="export-actions">
+            <button class="nav-btn nav-btn-secondary" onclick="previewExport('juniper')">View Preview</button>
+            <button class="nav-btn nav-btn-amber" onclick="downloadExport('juniper')">Download .set</button>
+          </div>
+        </div>
+
+        <!-- Export 21: Kubernetes NetworkPolicy -->
+        <div class="export-card">
+          <div>
+            <div class="export-top">
+              <div class="export-title">Kubernetes NetworkPolicy</div>
+              <span class="export-format">k8s-policy.yaml</span>
+            </div>
+            <p class="export-desc">
+              Cloud-native Kubernetes NetworkPolicy manifest with except CIDRs denying egress to threat endpoints.
+            </p>
+          </div>
+          <div class="export-actions">
+            <button class="nav-btn nav-btn-secondary" onclick="previewExport('k8s')">View Preview</button>
+            <button class="nav-btn nav-btn-amber" onclick="downloadExport('k8s')">Download .yaml</button>
+          </div>
+        </div>
+
       </div>
 
       <!-- Export Preview Box -->

@@ -18,6 +18,7 @@ from cti_core.processors.asn_lookup import ASNReputationProcessor
 from cti_core.processors.cidr_filter import CIDRFilter
 from cti_core.processors.dga_detector import DGADetector
 from cti_core.processors.domain_typosquat_evaluator import DomainTyposquatEvaluator
+from cti_core.processors.hassh_ssh_processor import HasshSSHProcessor
 from cti_core.processors.favicon_hash_calculator import FaviconHashCalculator
 from cti_core.processors.ja4_fingerprint_processor import JA4FingerprintProcessor
 from cti_core.processors.normalizer import defang, identify_indicator_type, refang
@@ -153,6 +154,10 @@ def build_parser() -> argparse.ArgumentParser:
     # Command: pagerank
     pr_p = subparsers.add_parser("pagerank", help="Compute PageRank influence on a comma-separated edge list")
     pr_p.add_argument("edges", type=str, help="Comma-separated edges formatted as u->v (e.g. 'ip1->dom1,ip1->dom2')")
+
+    # Command: hassh
+    hassh_p = subparsers.add_parser("hassh", help="Evaluate SSH client/server HASSH network fingerprint")
+    hassh_p.add_argument("fingerprint", type=str, help="32-char hexadecimal HASSH fingerprint")
 
     return parser
 
@@ -493,6 +498,18 @@ def main(args: Optional[List[str]] = None) -> int:
         out = {
             "edges": [f"{u}->{v}" for u, v in pairs],
             "rankings": ranks,
+        }
+        print(json.dumps(out, indent=2))
+        return 0
+
+    elif parsed.command == "hassh":
+        is_valid = HasshSSHProcessor.is_valid_hassh(parsed.fingerprint)
+        penalty, desc = HasshSSHProcessor.evaluate(parsed.fingerprint)
+        out = {
+            "fingerprint": parsed.fingerprint,
+            "is_valid": is_valid,
+            "penalty_score": penalty,
+            "classification": desc,
         }
         print(json.dumps(out, indent=2))
         return 0

@@ -25,6 +25,7 @@ from cti_core.processors.punycode import PunycodeProcessor
 from cti_core.scoring.bayesian_scorer import BayesianScorer
 from cti_core.scoring.kalman_confidence_filter import KalmanConfidenceFilter
 from cti_core.scoring.markov_threat_state import MarkovThreatStateModel, ThreatState
+from cti_core.scoring.pagerank_threat_graph import PageRankThreatGraph
 from cti_core.scoring.scoring_engine import global_scoring_engine
 
 
@@ -148,6 +149,10 @@ def build_parser() -> argparse.ArgumentParser:
     # Command: typosquat
     typo_p = subparsers.add_parser("typosquat", help="Evaluate domain for brand typosquatting distance")
     typo_p.add_argument("domain", type=str, help="Domain string (e.g. paypaal.com)")
+
+    # Command: pagerank
+    pr_p = subparsers.add_parser("pagerank", help="Compute PageRank influence on a comma-separated edge list")
+    pr_p.add_argument("edges", type=str, help="Comma-separated edges formatted as u->v (e.g. 'ip1->dom1,ip1->dom2')")
 
     return parser
 
@@ -474,6 +479,20 @@ def main(args: Optional[List[str]] = None) -> int:
             "is_typosquat": is_squat,
             "risk_penalty": penalty,
             "targeted_brand": brand,
+        }
+        print(json.dumps(out, indent=2))
+        return 0
+
+    elif parsed.command == "pagerank":
+        pairs = []
+        for pair_str in parsed.edges.split(","):
+            if "->" in pair_str:
+                u, v = pair_str.split("->", 1)
+                pairs.append((u.strip(), v.strip()))
+        ranks = PageRankThreatGraph.compute_pagerank(pairs)
+        out = {
+            "edges": [f"{u}->{v}" for u, v in pairs],
+            "rankings": ranks,
         }
         print(json.dumps(out, indent=2))
         return 0

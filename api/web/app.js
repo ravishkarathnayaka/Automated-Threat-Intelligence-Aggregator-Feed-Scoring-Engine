@@ -851,6 +851,21 @@ level: high`;
     return `apiVersion: networking.k8s.io/v1\nkind: NetworkPolicy\nmetadata:\n  name: sentinel-block-threat-egress\n  namespace: default\nspec:\n  podSelector: {}\n  policyTypes:\n  - Egress\n  egress:\n  - to:\n    - ipBlock:\n        cidr: 0.0.0.0/0\n        except:\n${cidrs.join('\n')}`;
   }
 
+  if (format === "istio") {
+    const blocks = highIocs.filter(i => i.type === "ipv4").map(i => `        - "${i.normalized_value}/32"`);
+    return `apiVersion: security.istio.io/v1beta1\nkind: AuthorizationPolicy\nmetadata:\n  name: sentinel-block-threat-actors\n  namespace: istio-system\nspec:\n  action: DENY\n  rules:\n  - from:\n    - source:\n        ipBlocks:\n${blocks.join('\n')}`;
+  }
+
+  if (format === "cilium") {
+    const cidrs = highIocs.filter(i => i.type === "ipv4").map(i => `    - cidr: "${i.normalized_value}/32"`);
+    return `apiVersion: cilium.io/v2\nkind: CiliumNetworkPolicy\nmetadata:\n  name: cilium-deny-threat-actors\n  namespace: production\nspec:\n  endpointSelector:\n    matchLabels: {}\n  egressDeny:\n  - toCIDRSet:\n${cidrs.join('\n')}`;
+  }
+
+  if (format === "okta") {
+    const gateways = highIocs.filter(i => i.type === "ipv4").map(i => ({ type: "CIDR", value: `${i.normalized_value}/32` }));
+    return JSON.stringify({ type: "IP", name: "Sentinel-Threat-Actors-Blocklist", status: "ACTIVE", gateways }, null, 2);
+  }
+
   return "";
 }
 
@@ -884,7 +899,10 @@ function downloadExport(format) {
     snort3: "rules",
     cisco: "json",
     juniper: "set",
-    k8s: "yaml"
+    k8s: "yaml",
+    istio: "yaml",
+    cilium: "yaml",
+    okta: "json"
   };
   const ext = extMap[format] || "txt";
   const filename = `threat_intel_${format}.${ext}`;

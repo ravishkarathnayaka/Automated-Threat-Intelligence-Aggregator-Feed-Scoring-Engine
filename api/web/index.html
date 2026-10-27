@@ -637,6 +637,57 @@
           </div>
         </div>
 
+        <!-- Export 22: Istio Service Mesh AuthorizationPolicy -->
+        <div class="export-card">
+          <div>
+            <div class="export-top">
+              <div class="export-title">Istio Service Mesh</div>
+              <span class="export-format">istio-policy.yaml</span>
+            </div>
+            <p class="export-desc">
+              Istio Service Mesh AuthorizationPolicy DENY manifest restricting service egress to threat IPs.
+            </p>
+          </div>
+          <div class="export-actions">
+            <button class="nav-btn nav-btn-secondary" onclick="previewExport('istio')">View Preview</button>
+            <button class="nav-btn nav-btn-amber" onclick="downloadExport('istio')">Download .yaml</button>
+          </div>
+        </div>
+
+        <!-- Export 23: Cilium eBPF NetworkPolicy -->
+        <div class="export-card">
+          <div>
+            <div class="export-top">
+              <div class="export-title">Cilium eBPF Policy</div>
+              <span class="export-format">cilium-policy.yaml</span>
+            </div>
+            <p class="export-desc">
+              eBPF line-rate egress denial policy for Cilium CNI targeting threat CIDRs and FQDNs.
+            </p>
+          </div>
+          <div class="export-actions">
+            <button class="nav-btn nav-btn-secondary" onclick="previewExport('cilium')">View Preview</button>
+            <button class="nav-btn nav-btn-amber" onclick="downloadExport('cilium')">Download .yaml</button>
+          </div>
+        </div>
+
+        <!-- Export 24: Okta Identity Network Zone -->
+        <div class="export-card">
+          <div>
+            <div class="export-top">
+              <div class="export-title">Okta Identity Zone</div>
+              <span class="export-format">okta-zone.json</span>
+            </div>
+            <p class="export-desc">
+              Okta Identity Cloud Network Zone IP blocklist payload restricting unauthorized identity access.
+            </p>
+          </div>
+          <div class="export-actions">
+            <button class="nav-btn nav-btn-secondary" onclick="previewExport('okta')">View Preview</button>
+            <button class="nav-btn nav-btn-amber" onclick="downloadExport('okta')">Download .json</button>
+          </div>
+        </div>
+
       </div>
 
       <!-- Export Preview Box -->

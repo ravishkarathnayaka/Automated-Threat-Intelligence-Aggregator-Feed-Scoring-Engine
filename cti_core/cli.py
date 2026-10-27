@@ -23,6 +23,7 @@ from cti_core.processors.favicon_hash_calculator import FaviconHashCalculator
 from cti_core.processors.ja4_fingerprint_processor import JA4FingerprintProcessor
 from cti_core.processors.ja4s_fingerprint_processor import JA4SFingerprintProcessor
 from cti_core.processors.beacon_jitter_analyzer import BeaconJitterAnalyzer
+from cti_core.processors.doh_anomaly_detector import DNSOverHTTPSDetector
 from cti_core.processors.normalizer import defang, identify_indicator_type, refang
 from cti_core.processors.punycode import PunycodeProcessor
 from cti_core.scoring.bayesian_scorer import BayesianScorer
@@ -182,6 +183,11 @@ def build_parser() -> argparse.ArgumentParser:
     # Command: dirichlet
     dir_p = subparsers.add_parser("dirichlet", help="Compute Dirichlet-Multinomial Bayesian multi-category threat scores")
     dir_p.add_argument("counts", type=str, help="Comma-separated key=count pairs (e.g. 'c2=15,malware=5,benign=1')")
+
+    # Command: doh
+    doh_p = subparsers.add_parser("doh", help="Evaluate indicator for DNS-over-HTTPS/TLS egress evasion")
+    doh_p.add_argument("indicator", type=str, help="Domain or IP address")
+    doh_p.add_argument("--type", type=str, default="domain", choices=["domain", "ipv4", "ipv6"], help="Indicator type")
     return parser
 
 
@@ -589,6 +595,19 @@ def main(args: Optional[List[str]] = None) -> int:
                 obs[k.strip().lower()] = int(v.strip())
         res = DirichletMultinomialScorer.classify(obs)
         print(json.dumps(res, indent=2))
+        return 0
+
+
+    elif parsed.command == "doh":
+        is_doh, penalty, desc = DNSOverHTTPSDetector.evaluate(parsed.indicator, ioc_type=parsed.type)
+        out = {
+            "indicator": parsed.indicator,
+            "type": parsed.type,
+            "is_doh_evasion": is_doh,
+            "risk_penalty": penalty,
+            "description": desc,
+        }
+        print(json.dumps(out, indent=2))
         return 0
 
     return 0

@@ -19,6 +19,7 @@ from cti_core.models.indicator import (
 from cti_core.pipeline import CTIPipeline, global_pipeline
 from cti_core.scoring.beta_distribution_scorer import BetaDistributionScorer
 from cti_core.scoring.dirichlet_multinomial_scorer import DirichletMultinomialScorer
+from cti_core.processors.beacon_jitter_analyzer import BeaconJitterAnalyzer
 from cti_core.scoring.kalman_confidence_filter import KalmanConfidenceFilter
 from cti_core.scoring.markov_threat_state import MarkovThreatStateModel, ThreatState
 from cti_core.scoring.pagerank_threat_graph import PageRankThreatGraph
@@ -480,3 +481,34 @@ async def compute_dirichlet(payload: DirichletRequest) -> DirichletResponse:
         prior_alphas=payload.prior_alphas,
     )
     return DirichletResponse(**res)
+
+
+class JitterAnalysisRequest(BaseModel):
+    timestamps: List[float] = Field(
+        default_factory=lambda: [100.0, 160.0, 220.0, 280.0, 340.0],
+        description="Ascending sequence of epoch timestamps in seconds",
+    )
+
+
+class JitterAnalysisResponse(BaseModel):
+    is_beacon: bool
+    coefficient_of_variation: float
+    risk_penalty: float
+    classification: str
+
+
+@router.post(
+    "/scoring/jitter-analysis",
+    response_model=JitterAnalysisResponse,
+    summary="Analyze C2 Beacon Regularity and Jitter",
+    description="Detect periodic Cobalt Strike / C2 beaconing using coefficient of variation over connection timestamps.",
+)
+async def analyze_beacon_jitter(payload: JitterAnalysisRequest) -> JitterAnalysisResponse:
+    """Analyze connection intervals for C2 beaconing patterns."""
+    is_beacon, cv, penalty, classification = BeaconJitterAnalyzer.analyze_intervals(payload.timestamps)
+    return JitterAnalysisResponse(
+        is_beacon=is_beacon,
+        coefficient_of_variation=cv,
+        risk_penalty=penalty,
+        classification=classification,
+    )

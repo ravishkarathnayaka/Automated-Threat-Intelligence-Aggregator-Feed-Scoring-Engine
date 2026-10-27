@@ -23,3 +23,13 @@ async def test_istio_policy_export_api():
         assert "text/yaml" in res.headers["content-type"]
         assert "kind: AuthorizationPolicy" in res.text
         assert "action: DENY" in res.text
+
+
+@pytest.mark.asyncio
+async def test_cilium_policy_export_api():
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        res = await client.get("/api/v1/export/cilium-policy.yaml?min_score=50")
+        assert res.status_code == 200
+        assert "text/yaml" in res.headers["content-type"]
+        assert "kind: CiliumNetworkPolicy" in res.text
+        assert "egressDeny:" in res.text

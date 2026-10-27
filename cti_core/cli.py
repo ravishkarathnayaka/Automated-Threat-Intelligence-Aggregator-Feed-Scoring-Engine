@@ -21,6 +21,7 @@ from cti_core.processors.domain_typosquat_evaluator import DomainTyposquatEvalua
 from cti_core.processors.hassh_ssh_processor import HasshSSHProcessor
 from cti_core.processors.favicon_hash_calculator import FaviconHashCalculator
 from cti_core.processors.ja4_fingerprint_processor import JA4FingerprintProcessor
+from cti_core.processors.ja4s_fingerprint_processor import JA4SFingerprintProcessor
 from cti_core.processors.normalizer import defang, identify_indicator_type, refang
 from cti_core.processors.punycode import PunycodeProcessor
 from cti_core.scoring.bayesian_scorer import BayesianScorer
@@ -167,6 +168,10 @@ def build_parser() -> argparse.ArgumentParser:
     beta_p.add_argument("--prior-alpha", type=float, default=1.0, help="Prior alpha (default 1.0)")
     beta_p.add_argument("--prior-beta", type=float, default=4.0, help="Prior beta (default 4.0)")
 
+
+    # Command: ja4s
+    ja4s_p = subparsers.add_parser("ja4s", help="Evaluate Fox-IT JA4S TLS server response fingerprint")
+    ja4s_p.add_argument("fingerprint", type=str, help="Fox-IT JA4S server fingerprint")
     return parser
 
 
@@ -537,6 +542,19 @@ def main(args: Optional[List[str]] = None) -> int:
 
 
 
+
+
+    elif parsed.command == "ja4s":
+        is_valid = JA4SFingerprintProcessor.is_valid_ja4s(parsed.fingerprint)
+        penalty, desc = JA4SFingerprintProcessor.evaluate(parsed.fingerprint)
+        out = {
+            "fingerprint": parsed.fingerprint,
+            "is_valid": is_valid,
+            "penalty_score": penalty,
+            "classification": desc,
+        }
+        print(json.dumps(out, indent=2))
+        return 0
 
     return 0
 

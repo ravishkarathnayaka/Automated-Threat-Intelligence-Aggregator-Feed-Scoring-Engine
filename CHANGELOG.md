@@ -7,6 +7,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [3.5.0] - 2026-10-27
+
+### Added
+- **Cloud-Native Service Mesh & Zero Trust Enforcers**:
+  - `IstioPolicyExporter`: Istio Service Mesh AuthorizationPolicy DENY manifest exporter (`/api/v1/export/istio-policy.yaml`).
+  - `CiliumPolicyExporter`: Cilium eBPF NetworkPolicy L3/L4/L7 egress denial manifest exporter (`/api/v1/export/cilium-policy.yaml`).
+  - `EnvoyProxyExporter`: Envoy Proxy RBAC network filter denial configuration exporter.
+  - `OktaZoneExporter`: Okta Identity Cloud Network Zone IP blocklist REST API payload exporter (`/api/v1/export/okta-zone.json`).
+  - `TailscaleACLExporter`: Tailscale Tailnet ACL kernel drop policy exporter.
+  - `CloudflareZeroTrustExporter`: Cloudflare Zero Trust Gateway list items exporter.
+  - `OpenSearchMonitorExporter`: OpenSearch Security Analytics threat detector monitor JSON exporter.
+
+- **Next-Gen Threat Telemetry Collectors**:
+  - `CybercrimeTrackerCollector`: Malware control panel & C2 host intelligence collector.
+  - `ThreatFoxCollector`: ThreatFox payload download URL and SHA256 IOC collector.
+  - `OpenPhishCollector`: OpenPhish verified phishing URL telemetry collector.
+  - `AbuseIPDBCollector`: High-confidence AbuseIPDB IP blacklist collector.
+  - `IPSumCollector`: Multi-source aggregated reputation threat IP collector.
+  - `StratosphereLabCollector`: IoT botnet C2 network capture feed collector.
+  - `MalcodeCollector`: Drive-by malware payload domain database collector.
+
+- **Deep Threat Feature Processors**:
+  - `JA4SFingerprintProcessor`: Fox-IT JA4S TLS server response fingerprint analyzer.
+  - `JA4XCertificateProcessor`: Fox-IT JA4X X.509 certificate extension fingerprint analyzer.
+  - `DNSOverHTTPSDetector`: DNS-over-HTTPS (DoH) and DoT egress evasion detector.
+  - `DGAHellingerClassifier`: Hellinger distance character frequency DGA classifier.
+  - `BeaconJitterAnalyzer`: C2 beacon inter-arrival regularity and jitter variance estimator.
+  - `TLSALPNAnomalyClassifier`: TLS ALPN application layer protocol negotiation anomaly classifier.
+  - `SSLCertificateValidityEvaluator`: X.509 certificate lifespan anomaly evaluator.
+
+- **Stochastic Scoring & Information Geometry Models**:
+  - `DirichletMultinomialScorer`: Dirichlet-Multinomial Bayesian multi-category threat classifier.
+  - `HITSAuthorityScorer`: Kleinberg HITS threat hub and authority centrality model.
+  - `GumbelExtremeValueModel`: Gumbel Type-I extreme value distribution for rare APT volume surges.
+  - `KLDivergenceEvaluator`: Relative entropy and Jensen-Shannon feed drift evaluator.
+  - `LaplaceSmoothingTracker`: Additive Laplace precision smoothing estimator.
+  - `MahalanobisDistanceScorer`: Regularized multivariate outlier detector for correlated telemetry.
+  - `BrayCurtisDissimilarityTracker`: Bray-Curtis ecological dissimilarity for feed portfolio uniqueness.
+
+- **REST API Endpoints & CLI Subcommands**:
+  - Added `/api/v1/export/istio-policy.yaml`, `/api/v1/export/cilium-policy.yaml`, and `/api/v1/export/okta-zone.json`.
+  - Added `/api/v1/scoring/dirichlet` and `/api/v1/scoring/jitter-analysis`.
+  - Added CLI commands `ja4s`, `jitter`, `dirichlet`, and `doh`.
+  - Updated web portal dashboard with Istio, Cilium, and Okta Zero Trust export cards.
+
+---
+
 ## [3.0.0] - 2026-10-24
 
 ### Added

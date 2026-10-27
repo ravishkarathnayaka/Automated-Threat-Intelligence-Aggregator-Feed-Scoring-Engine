@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "threat-intelligence-scoring-engine"
-version = "1.0.0"
+version = "3.5.0"
 description = "Automated Cyber Threat Intelligence (CTI) Ingestion, Normalization, Confidence-Scoring, and Enforcement Engine."
 readme = "README.md"
 authors = [{ name = "CTI Engineering Team" }]

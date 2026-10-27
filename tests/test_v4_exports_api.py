@@ -33,3 +33,14 @@ async def test_cilium_policy_export_api():
         assert "text/yaml" in res.headers["content-type"]
         assert "kind: CiliumNetworkPolicy" in res.text
         assert "egressDeny:" in res.text
+
+
+@pytest.mark.asyncio
+async def test_okta_zone_export_api():
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        res = await client.get("/api/v1/export/okta-zone.json?min_score=50")
+        assert res.status_code == 200
+        assert "application/json" in res.headers["content-type"]
+        data = res.json()
+        assert data["type"] == "IP"
+        assert "gateways" in data

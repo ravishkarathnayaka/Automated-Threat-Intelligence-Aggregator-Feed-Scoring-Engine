@@ -18,6 +18,7 @@ from cti_core.exporters.elastic_exporter import ElasticExporter
 from cti_core.exporters.firewall_blocklist import FirewallBlocklistExporter
 from cti_core.exporters.fortinet_exporter import FortinetExporter
 from cti_core.exporters.juniper_srx_exporter import JuniperSRXExporter
+from cti_core.exporters.cilium_policy_exporter import CiliumPolicyExporter
 from cti_core.exporters.istio_policy_exporter import IstioPolicyExporter
 from cti_core.exporters.k8s_network_policy_exporter import K8sNetworkPolicyExporter
 from cti_core.exporters.microsoft_sentinel_exporter import MicrosoftSentinelExporter
@@ -897,4 +898,35 @@ async def export_istio_policy(
         content=content,
         media_type="text/yaml; charset=utf-8",
         headers={"Content-Disposition": 'inline; filename="istio_threat_policy.yaml"'},
+    )
+
+
+@router.get(
+    "/cilium-policy.yaml",
+    response_class=Response,
+    summary="Export Cilium eBPF NetworkPolicy YAML",
+    description="Cilium eBPF NetworkPolicy L3/L4 egress denial manifest restricting communication with threat IPs.",
+)
+async def export_cilium_policy(
+    min_score: float = Query(75.0, ge=0.0, le=100.0, description="Minimum confidence score threshold"),
+    namespace: str = Query("production", description="Kubernetes namespace"),
+    session: AsyncSession = Depends(get_db_session),
+) -> Response:
+    """Stream Cilium NetworkPolicy YAML manifest."""
+    stmt = (
+        select(IndicatorModel)
+        .where(
+            IndicatorModel.is_whitelisted.is_(False),
+            IndicatorModel.confidence_score >= min_score,
+        )
+        .order_by(IndicatorModel.confidence_score.desc())
+    )
+    result = await session.execute(stmt)
+    indicators = result.scalars().all()
+
+    content = CiliumPolicyExporter.export_yaml_manifest(indicators, namespace=namespace, min_score=min_score)
+    return Response(
+        content=content,
+        media_type="text/yaml; charset=utf-8",
+        headers={"Content-Disposition": 'inline; filename="cilium_threat_policy.yaml"'},
     )

@@ -27,6 +27,7 @@ from cti_core.processors.normalizer import defang, identify_indicator_type, refa
 from cti_core.processors.punycode import PunycodeProcessor
 from cti_core.scoring.bayesian_scorer import BayesianScorer
 from cti_core.scoring.beta_distribution_scorer import BetaDistributionScorer
+from cti_core.scoring.dirichlet_multinomial_scorer import DirichletMultinomialScorer
 from cti_core.scoring.kalman_confidence_filter import KalmanConfidenceFilter
 from cti_core.scoring.markov_threat_state import MarkovThreatStateModel, ThreatState
 from cti_core.scoring.pagerank_threat_graph import PageRankThreatGraph
@@ -177,6 +178,10 @@ def build_parser() -> argparse.ArgumentParser:
     # Command: jitter
     jitter_p = subparsers.add_parser("jitter", help="Analyze connection timestamps for C2 beacon periodicity and jitter")
     jitter_p.add_argument("timestamps", type=str, help="Comma-separated ascending epoch timestamps (e.g. '100,160,220,280')")
+
+    # Command: dirichlet
+    dir_p = subparsers.add_parser("dirichlet", help="Compute Dirichlet-Multinomial Bayesian multi-category threat scores")
+    dir_p.add_argument("counts", type=str, help="Comma-separated key=count pairs (e.g. 'c2=15,malware=5,benign=1')")
     return parser
 
 
@@ -573,6 +578,17 @@ def main(args: Optional[List[str]] = None) -> int:
             "classification": desc,
         }
         print(json.dumps(out, indent=2))
+        return 0
+
+
+    elif parsed.command == "dirichlet":
+        obs = {}
+        for pair in parsed.counts.split(","):
+            if "=" in pair:
+                k, v = pair.split("=", 1)
+                obs[k.strip().lower()] = int(v.strip())
+        res = DirichletMultinomialScorer.classify(obs)
+        print(json.dumps(res, indent=2))
         return 0
 
     return 0

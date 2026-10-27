@@ -19,6 +19,7 @@ from cti_core.exporters.firewall_blocklist import FirewallBlocklistExporter
 from cti_core.exporters.fortinet_exporter import FortinetExporter
 from cti_core.exporters.juniper_srx_exporter import JuniperSRXExporter
 from cti_core.exporters.cilium_policy_exporter import CiliumPolicyExporter
+from cti_core.exporters.okta_zone_exporter import OktaZoneExporter
 from cti_core.exporters.istio_policy_exporter import IstioPolicyExporter
 from cti_core.exporters.k8s_network_policy_exporter import K8sNetworkPolicyExporter
 from cti_core.exporters.microsoft_sentinel_exporter import MicrosoftSentinelExporter
@@ -929,4 +930,35 @@ async def export_cilium_policy(
         content=content,
         media_type="text/yaml; charset=utf-8",
         headers={"Content-Disposition": 'inline; filename="cilium_threat_policy.yaml"'},
+    )
+
+
+@router.get(
+    "/okta-zone.json",
+    response_class=Response,
+    summary="Export Okta Identity Network Zone JSON",
+    description="Okta Identity Cloud Network Zone IP blocklist payload restricting unauthorized identity access.",
+)
+async def export_okta_zone(
+    min_score: float = Query(75.0, ge=0.0, le=100.0, description="Minimum confidence score threshold"),
+    zone_name: str = Query("Sentinel-Threat-Actors-Blocklist", description="Okta network zone name"),
+    session: AsyncSession = Depends(get_db_session),
+) -> Response:
+    """Stream Okta Network Zone JSON payload."""
+    stmt = (
+        select(IndicatorModel)
+        .where(
+            IndicatorModel.is_whitelisted.is_(False),
+            IndicatorModel.confidence_score >= min_score,
+        )
+        .order_by(IndicatorModel.confidence_score.desc())
+    )
+    result = await session.execute(stmt)
+    indicators = result.scalars().all()
+
+    content = OktaZoneExporter.export_zone_json(indicators, zone_name=zone_name, min_score=min_score)
+    return Response(
+        content=content,
+        media_type="application/json; charset=utf-8",
+        headers={"Content-Disposition": 'inline; filename="okta_network_zone.json"'},
     )

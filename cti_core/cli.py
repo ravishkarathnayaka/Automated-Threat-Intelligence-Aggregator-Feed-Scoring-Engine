@@ -22,6 +22,7 @@ from cti_core.processors.hassh_ssh_processor import HasshSSHProcessor
 from cti_core.processors.favicon_hash_calculator import FaviconHashCalculator
 from cti_core.processors.ja4_fingerprint_processor import JA4FingerprintProcessor
 from cti_core.processors.ja4s_fingerprint_processor import JA4SFingerprintProcessor
+from cti_core.processors.beacon_jitter_analyzer import BeaconJitterAnalyzer
 from cti_core.processors.normalizer import defang, identify_indicator_type, refang
 from cti_core.processors.punycode import PunycodeProcessor
 from cti_core.scoring.bayesian_scorer import BayesianScorer
@@ -172,6 +173,10 @@ def build_parser() -> argparse.ArgumentParser:
     # Command: ja4s
     ja4s_p = subparsers.add_parser("ja4s", help="Evaluate Fox-IT JA4S TLS server response fingerprint")
     ja4s_p.add_argument("fingerprint", type=str, help="Fox-IT JA4S server fingerprint")
+
+    # Command: jitter
+    jitter_p = subparsers.add_parser("jitter", help="Analyze connection timestamps for C2 beacon periodicity and jitter")
+    jitter_p.add_argument("timestamps", type=str, help="Comma-separated ascending epoch timestamps (e.g. '100,160,220,280')")
     return parser
 
 
@@ -551,6 +556,20 @@ def main(args: Optional[List[str]] = None) -> int:
             "fingerprint": parsed.fingerprint,
             "is_valid": is_valid,
             "penalty_score": penalty,
+            "classification": desc,
+        }
+        print(json.dumps(out, indent=2))
+        return 0
+
+
+    elif parsed.command == "jitter":
+        ts = [float(x.strip()) for x in parsed.timestamps.split(",") if x.strip()]
+        is_beacon, cv, penalty, desc = BeaconJitterAnalyzer.analyze_intervals(ts)
+        out = {
+            "timestamps_count": len(ts),
+            "is_beacon": is_beacon,
+            "coefficient_of_variation": cv,
+            "risk_penalty": penalty,
             "classification": desc,
         }
         print(json.dumps(out, indent=2))

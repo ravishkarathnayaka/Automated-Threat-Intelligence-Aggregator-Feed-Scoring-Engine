@@ -18,6 +18,7 @@ from cti_core.models.indicator import (
 )
 from cti_core.pipeline import CTIPipeline, global_pipeline
 from cti_core.scoring.beta_distribution_scorer import BetaDistributionScorer
+from cti_core.scoring.dirichlet_multinomial_scorer import DirichletMultinomialScorer
 from cti_core.scoring.kalman_confidence_filter import KalmanConfidenceFilter
 from cti_core.scoring.markov_threat_state import MarkovThreatStateModel, ThreatState
 from cti_core.scoring.pagerank_threat_graph import PageRankThreatGraph
@@ -450,4 +451,32 @@ async def compute_pagerank(payload: PageRankRequest) -> PageRankResponse:
     )
 
 
+class DirichletRequest(BaseModel):
+    observations: Dict[str, int] = Field(
+        default_factory=lambda: {"c2": 20, "malware": 10, "benign": 1},
+        description="Observed category counts for indicator",
+    )
+    prior_alphas: Optional[Dict[str, float]] = None
 
+
+class DirichletResponse(BaseModel):
+    probabilities: Dict[str, float]
+    variances: Dict[str, float]
+    dominant_category: str
+    entropy: float
+    composite_threat_score: float
+
+
+@router.post(
+    "/scoring/dirichlet",
+    response_model=DirichletResponse,
+    summary="Compute Dirichlet-Multinomial Threat Categorization",
+    description="Calculate multi-category posterior probabilities, variances, entropy, and composite threat score.",
+)
+async def compute_dirichlet(payload: DirichletRequest) -> DirichletResponse:
+    """Calculate Dirichlet-Multinomial posterior threat distribution."""
+    res = DirichletMultinomialScorer.classify(
+        observations=payload.observations,
+        prior_alphas=payload.prior_alphas,
+    )
+    return DirichletResponse(**res)

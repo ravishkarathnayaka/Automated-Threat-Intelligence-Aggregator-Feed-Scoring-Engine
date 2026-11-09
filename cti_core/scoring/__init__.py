@@ -16,10 +16,24 @@ from cti_core.scoring.scoring_engine import (
 )
 from cti_core.scoring.tenant_profiles import TenantProfile, TenantProfileManager
 from cti_core.scoring.weibull_reliability_model import WeibullReliabilityModel
+from cti_core.scoring.dempster_shafer_scorer import DempsterShaferScorer
+from cti_core.scoring.wasserstein_drift_evaluator import WassersteinDriftEvaluator
+from cti_core.scoring.cusum_changepoint_detector import CUSUMChangePointDetector
+from cti_core.scoring.thompson_sampling_bandit import ThompsonSamplingBandit
+from cti_core.scoring.brier_score_calibrator import BrierScoreCalibrator
+from cti_core.scoring.hawkes_process_intensity import HawkesProcessIntensityModel
+from cti_core.scoring.bhattacharyya_distance_scorer import BhattacharyyaDistanceScorer
 
 __all__ = [
     "BayesianScorer",
+    "BhattacharyyaDistanceScorer",
+    "BrierScoreCalibrator",
+    "CUSUMChangePointDetector",
+    "DempsterShaferScorer",
+    "HawkesProcessIntensityModel",
     "ScoringEngine",
+    "ThompsonSamplingBandit",
+    "WassersteinDriftEvaluator",
     "global_scoring_engine",
     "ConsensusScorer",
     "FeedReliabilityTracker",

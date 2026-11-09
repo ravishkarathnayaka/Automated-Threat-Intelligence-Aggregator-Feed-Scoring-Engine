@@ -7,6 +7,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [4.0.0] - 2026-11-09
+
+### Added
+- **SASE, CASB, Cloud WAF & Calico CNI Exporters**:
+  - `NetskopeCASBExporter`: Netskope REST API v2 Custom URL & IP List JSON exporter (`/api/v1/export/netskope-casb.json`).
+  - `ZscalerZIAExporter`: Zscaler Internet Access (ZIA) Secure Web Gateway custom URL category exporter (`/api/v1/export/zscaler-zia.json`).
+  - `GoogleCloudArmorExporter`: Google Cloud Armor edge WAF SecurityPolicy rules exporter (`/api/v1/export/cloud-armor.json`).
+  - `AWSWAFv2Exporter`: AWS WAFv2 Regional and CloudFront IPSet JSON exporter.
+  - `CalicoPolicyExporter`: Project Calico v3 GlobalNetworkPolicy Kubernetes CNI manifest exporter (`/api/v1/export/calico-policy.yaml`).
+  - `KongGatewayExporter`: Kong API Gateway `ip-restriction` plugin configuration exporter.
+  - `DatadogSIEMExporter`: Datadog Cloud SIEM Reference Table JSON exporter.
+
+- **Next-Gen OSINT, C2 & Ransomware Telemetry Collectors**:
+  - `BotvrijCollector`: Botvrij.eu open-source malware destination IP and domain collector.
+  - `EmergingThreatsCollector`: Proofpoint Emerging Threats (ET) compromised host IP collector.
+  - `PhishStatsCollector`: PhishStats real-time high-risk phishing URL telemetry collector.
+  - `MalwareDomainListCollector`: MalwareDomainList exploit kit and distribution host collector.
+  - `MontySecurityC2Collector`: MontySecurity C2 Tracker (Cobalt Strike, Sliver, Havoc, Brute Ratel) collector.
+  - `RansomwareLiveCollector`: Ransomware.live active extortion group portal and C2 domain collector.
+  - `DShieldScannerCollector`: SANS Internet Storm Center (ISC) DShield top attacking subnet collector.
+  - `BruteForceBlockerCollector`: BruteForceBlocker automated SSH/credential stuffing IP collector.
+
+- **Network Stack, Cryptographic & DNS Covert Channel Processors**:
+  - `JA4HFingerprintProcessor`: Fox-IT JA4H HTTP client header and cookie fingerprint analyzer.
+  - `JA4LLatencyProcessor`: Fox-IT JA4L light-distance/latency and hop-count proxy/Tor detector.
+  - `JA4TTCPProcessor`: Fox-IT JA4T TCP SYN stack and raw-socket stateless scanner detector.
+  - `DNSTunnelingDetector`: High-entropy subdomain exfiltration (iodine/dnscat2) covert channel detector.
+  - `FastFluxDNSDetector`: Single-Flux and Double-Flux multi-ASN botnet proxy rotation detector.
+  - `BGPRPKIValidator`: BGP Route Origin Validation (RPKI ROA) and sub-prefix hijack evaluator.
+  - `PEImphashProcessor`: Windows Portable Executable (PE) ImpHash and Authenticode signature analyzer.
+
+- **Evidential Reasoning, Point Processes & Optimal Transport Scoring Models**:
+  - `DempsterShaferScorer`: Dempster-Shafer Evidence Theory (Belief, Plausibility & Pignistic probability) multi-feed fusion (`/api/v1/scoring/dempster-shafer`).
+  - `HawkesProcessIntensityModel`: Self-exciting Hawkes point process for clustered APT swarm velocity (`/api/v1/scoring/hawkes-intensity`).
+  - `WassersteinDriftEvaluator`: 1-D Earth Mover's Distance ($W_1$) optimal transport feed drift evaluator (`/api/v1/scoring/wasserstein-drift`).
+  - `CUSUMChangePointDetector`: Page's tabular Cumulative Sum sequential regime shift detector.
+  - `ThompsonSamplingBandit`: Multi-Armed Bandit adaptive threat feed polling scheduler.
+  - `BrierScoreCalibrator`: Quadratic proper scoring rule for empirical feed probability calibration.
+  - `BhattacharyyaDistanceScorer`: Bhattacharyya coefficient and distance for MITRE ATT&CK campaign attribution.
+
+- **CLI Subcommands & Web Portal Enhancements**:
+  - Added CLI subcommands: `ja4h`, `ja4t`, `dns-tunnel`, `rpki`, `dempster`, `hawkes`, and `cusum`.
+  - Added Netskope CASB, Zscaler ZIA, Google Cloud Armor, and Project Calico export cards and live previewers to the web portal.
+  - Added architectural guides: `docs/SASE_CASB_CLOUD_WAF_ENFORCEMENT.md` and `docs/EVIDENTIAL_REASONING_POINT_PROCESSES.md`.
+
+---
+
 ## [3.5.0] - 2026-10-27
 
 ### Added

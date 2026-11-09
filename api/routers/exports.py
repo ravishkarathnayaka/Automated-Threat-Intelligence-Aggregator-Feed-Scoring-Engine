@@ -21,6 +21,10 @@ from cti_core.exporters.juniper_srx_exporter import JuniperSRXExporter
 from cti_core.exporters.cilium_policy_exporter import CiliumPolicyExporter
 from cti_core.exporters.okta_zone_exporter import OktaZoneExporter
 from cti_core.exporters.istio_policy_exporter import IstioPolicyExporter
+from cti_core.exporters.netskope_casb_exporter import NetskopeCASBExporter
+from cti_core.exporters.zscaler_zia_exporter import ZscalerZIAExporter
+from cti_core.exporters.google_cloud_armor_exporter import GoogleCloudArmorExporter
+from cti_core.exporters.calico_policy_exporter import CalicoPolicyExporter
 from cti_core.exporters.k8s_network_policy_exporter import K8sNetworkPolicyExporter
 from cti_core.exporters.microsoft_sentinel_exporter import MicrosoftSentinelExporter
 from cti_core.exporters.misp_exporter import MISPExporter
@@ -961,4 +965,128 @@ async def export_okta_zone(
         content=content,
         media_type="application/json; charset=utf-8",
         headers={"Content-Disposition": 'inline; filename="okta_network_zone.json"'},
+    )
+
+
+@router.get(
+    "/netskope-casb.json",
+    response_class=Response,
+    summary="Export Netskope CASB & SWG URL/IP List JSON",
+    description="Netskope REST API v2 custom URL and IP blocklist payload for SASE and CASB policy enforcement.",
+)
+async def export_netskope_casb(
+    min_score: float = Query(75.0, ge=0.0, le=100.0, description="Minimum confidence score threshold"),
+    list_name: str = Query("Sentinel-CTI-Block-List", description="Netskope custom list name"),
+    session: AsyncSession = Depends(get_db_session),
+) -> Response:
+    """Stream Netskope CASB custom URL/IP list JSON payload."""
+    stmt = (
+        select(IndicatorModel)
+        .where(
+            IndicatorModel.is_whitelisted.is_(False),
+            IndicatorModel.confidence_score >= min_score,
+        )
+        .order_by(IndicatorModel.confidence_score.desc())
+    )
+    result = await session.execute(stmt)
+    indicators = result.scalars().all()
+
+    content = NetskopeCASBExporter.export_url_list_json(indicators, list_name=list_name, min_score=min_score)
+    return Response(
+        content=content,
+        media_type="application/json; charset=utf-8",
+        headers={"Content-Disposition": 'inline; filename="netskope_casb_list.json"'},
+    )
+
+
+@router.get(
+    "/zscaler-zia.json",
+    response_class=Response,
+    summary="Export Zscaler Internet Access (ZIA) Custom Category JSON",
+    description="Zscaler ZIA Secure Web Gateway custom URL and IP destination category JSON payload.",
+)
+async def export_zscaler_zia(
+    min_score: float = Query(75.0, ge=0.0, le=100.0, description="Minimum confidence score threshold"),
+    category_id: str = Query("CUSTOM_01", description="Zscaler ZIA custom category ID"),
+    session: AsyncSession = Depends(get_db_session),
+) -> Response:
+    """Stream Zscaler ZIA custom URL category JSON payload."""
+    stmt = (
+        select(IndicatorModel)
+        .where(
+            IndicatorModel.is_whitelisted.is_(False),
+            IndicatorModel.confidence_score >= min_score,
+        )
+        .order_by(IndicatorModel.confidence_score.desc())
+    )
+    result = await session.execute(stmt)
+    indicators = result.scalars().all()
+
+    content = ZscalerZIAExporter.export_zia_category_json(indicators, category_id=category_id, min_score=min_score)
+    return Response(
+        content=content,
+        media_type="application/json; charset=utf-8",
+        headers={"Content-Disposition": 'inline; filename="zscaler_zia_category.json"'},
+    )
+
+
+@router.get(
+    "/cloud-armor.json",
+    response_class=Response,
+    summary="Export Google Cloud Armor Security Policy JSON",
+    description="Google Cloud Armor edge WAF security policy rules denying high-confidence threat IPs.",
+)
+async def export_google_cloud_armor(
+    min_score: float = Query(75.0, ge=0.0, le=100.0, description="Minimum confidence score threshold"),
+    policy_name: str = Query("sentinel-cloud-armor-blocklist", description="Cloud Armor policy name"),
+    session: AsyncSession = Depends(get_db_session),
+) -> Response:
+    """Stream Google Cloud Armor WAF policy JSON payload."""
+    stmt = (
+        select(IndicatorModel)
+        .where(
+            IndicatorModel.is_whitelisted.is_(False),
+            IndicatorModel.confidence_score >= min_score,
+        )
+        .order_by(IndicatorModel.confidence_score.desc())
+    )
+    result = await session.execute(stmt)
+    indicators = result.scalars().all()
+
+    content = GoogleCloudArmorExporter.export_policy_json(indicators, policy_name=policy_name, min_score=min_score)
+    return Response(
+        content=content,
+        media_type="application/json; charset=utf-8",
+        headers={"Content-Disposition": 'inline; filename="google_cloud_armor_policy.json"'},
+    )
+
+
+@router.get(
+    "/calico-policy.yaml",
+    response_class=Response,
+    summary="Export Project Calico GlobalNetworkPolicy YAML",
+    description="Project Calico v3 GlobalNetworkPolicy YAML manifest enforcing cluster-wide ingress and egress denial.",
+)
+async def export_calico_policy(
+    min_score: float = Query(75.0, ge=0.0, le=100.0, description="Minimum confidence score threshold"),
+    policy_name: str = Query("sentinel-calico-deny-threat-feeds", description="Calico policy name"),
+    session: AsyncSession = Depends(get_db_session),
+) -> Response:
+    """Stream Project Calico GlobalNetworkPolicy YAML manifest."""
+    stmt = (
+        select(IndicatorModel)
+        .where(
+            IndicatorModel.is_whitelisted.is_(False),
+            IndicatorModel.confidence_score >= min_score,
+        )
+        .order_by(IndicatorModel.confidence_score.desc())
+    )
+    result = await session.execute(stmt)
+    indicators = result.scalars().all()
+
+    content = CalicoPolicyExporter.export_yaml_manifest(indicators, policy_name=policy_name, min_score=min_score)
+    return Response(
+        content=content,
+        media_type="text/yaml; charset=utf-8",
+        headers={"Content-Disposition": 'inline; filename="calico_global_policy.yaml"'},
     )

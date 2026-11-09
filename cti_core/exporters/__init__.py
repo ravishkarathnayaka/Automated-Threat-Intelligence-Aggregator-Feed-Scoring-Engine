@@ -30,16 +30,30 @@ from cti_core.exporters.wazuh_exporter import WazuhExporter
 from cti_core.exporters.yara_exporter import YARAExporter
 from cti_core.exporters.zeek_exporter import ZeekIntelExporter
 from cti_core.exporters.bro_notice_exporter import ZeekNoticeExporter
+from cti_core.exporters.netskope_casb_exporter import NetskopeCASBExporter
+from cti_core.exporters.zscaler_zia_exporter import ZscalerZIAExporter
+from cti_core.exporters.google_cloud_armor_exporter import GoogleCloudArmorExporter
+from cti_core.exporters.aws_wafv2_exporter import AWSWAFv2Exporter
+from cti_core.exporters.calico_policy_exporter import CalicoPolicyExporter
+from cti_core.exporters.kong_gateway_exporter import KongGatewayExporter
+from cti_core.exporters.datadog_siem_exporter import DatadogSIEMExporter
 
 __all__ = [
     "AWSNetworkFirewallExporter",
+    "AWSWAFv2Exporter",
     "AzureFirewallExporter",
+    "CalicoPolicyExporter",
     "CheckPointExporter",
     "CarbonBlackExporter",
     "CloudflareWAFExporter",
     "CrowdStrikeExporter",
     "CrowdStrikeFDRExporter",
     "CSVExporter",
+    "DatadogSIEMExporter",
+    "GoogleCloudArmorExporter",
+    "KongGatewayExporter",
+    "NetskopeCASBExporter",
+    "ZscalerZIAExporter",
     "STIXExporter",
     "FirewallBlocklistExporter",
     "FortinetExporter",

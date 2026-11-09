@@ -19,6 +19,9 @@ from cti_core.models.indicator import (
 from cti_core.pipeline import CTIPipeline, global_pipeline
 from cti_core.scoring.beta_distribution_scorer import BetaDistributionScorer
 from cti_core.scoring.dirichlet_multinomial_scorer import DirichletMultinomialScorer
+from cti_core.scoring.dempster_shafer_scorer import DempsterShaferScorer
+from cti_core.scoring.hawkes_process_intensity import HawkesProcessIntensityModel
+from cti_core.scoring.wasserstein_drift_evaluator import WassersteinDriftEvaluator
 from cti_core.processors.beacon_jitter_analyzer import BeaconJitterAnalyzer
 from cti_core.scoring.kalman_confidence_filter import KalmanConfidenceFilter
 from cti_core.scoring.markov_threat_state import MarkovThreatStateModel, ThreatState
@@ -510,5 +513,112 @@ async def analyze_beacon_jitter(payload: JitterAnalysisRequest) -> JitterAnalysi
         is_beacon=is_beacon,
         coefficient_of_variation=cv,
         risk_penalty=penalty,
+        classification=classification,
+    )
+
+
+class DempsterShaferRequest(BaseModel):
+    masses: List[Dict[str, float]] = Field(
+        default_factory=lambda: [
+            {"malicious": 0.75, "benign": 0.05, "uncertain": 0.20},
+            {"malicious": 0.80, "benign": 0.05, "uncertain": 0.15},
+        ],
+        description="List of Basic Probability Assignments (malicious, benign, uncertain)",
+    )
+
+
+class DempsterShaferResponse(BaseModel):
+    belief_malicious: float
+    plausibility_malicious: float
+    uncertainty_interval: float
+    conflict_k: float
+    composite_score: float
+
+
+@router.post(
+    "/scoring/dempster-shafer",
+    response_model=DempsterShaferResponse,
+    summary="Compute Dempster-Shafer Multi-Feed Evidence Fusion",
+    description="Fuse uncertain threat feed assertions using Dempster's Rule of Combination to compute Belief, Plausibility, and Pignistic score.",
+)
+async def compute_dempster_shafer(payload: DempsterShaferRequest) -> DempsterShaferResponse:
+    """Calculate Dempster-Shafer belief and plausibility interval."""
+    res = DempsterShaferScorer.fuse_evidence(payload.masses)
+    return DempsterShaferResponse(**res)
+
+
+class HawkesRequest(BaseModel):
+    timestamps: List[float] = Field(
+        default_factory=lambda: [9.1, 9.4, 9.6, 9.8, 10.0],
+        description="Ascending sequence of sighting timestamps",
+    )
+    evaluation_time: float = Field(10.0, description="Evaluation timestamp t")
+    baseline_mu: float = Field(0.10, ge=0.01, le=5.0)
+    excitation_alpha: float = Field(0.85, ge=0.05, le=5.0)
+    decay_beta: float = Field(1.20, ge=0.10, le=10.0)
+
+
+class HawkesResponse(BaseModel):
+    intensity_lambda: float
+    branching_ratio: float
+    risk_boost: float
+    regime: str
+
+
+@router.post(
+    "/scoring/hawkes-intensity",
+    response_model=HawkesResponse,
+    summary="Compute Hawkes Self-Exciting Campaign Intensity",
+    description="Calculate conditional intensity and branching ratio of clustered APT or botnet sightings.",
+)
+async def compute_hawkes_intensity(payload: HawkesRequest) -> HawkesResponse:
+    """Calculate Hawkes self-exciting point process intensity."""
+    lam, br, boost, regime = HawkesProcessIntensityModel.compute_intensity(
+        event_timestamps=payload.timestamps,
+        evaluation_time=payload.evaluation_time,
+        baseline_mu=payload.baseline_mu,
+        excitation_alpha=payload.excitation_alpha,
+        decay_beta=payload.decay_beta,
+    )
+    return HawkesResponse(
+        intensity_lambda=lam,
+        branching_ratio=br,
+        risk_boost=boost,
+        regime=regime,
+    )
+
+
+class WassersteinDriftRequest(BaseModel):
+    baseline_scores: List[float] = Field(
+        default_factory=lambda: [70.0, 72.0, 75.0, 78.0, 80.0],
+        description="Reference window confidence scores",
+    )
+    current_scores: List[float] = Field(
+        default_factory=lambda: [88.0, 91.0, 93.0, 95.0, 96.0],
+        description="Current window confidence scores",
+    )
+
+
+class WassersteinDriftResponse(BaseModel):
+    w1_distance: float
+    is_drifted: bool
+    classification: str
+
+
+@router.post(
+    "/scoring/wasserstein-drift",
+    response_model=WassersteinDriftResponse,
+    summary="Evaluate 1-Wasserstein Feed Distribution Drift",
+    description="Compute exact 1-D Earth Mover's Distance (W1) between reference and current feed confidence distributions.",
+)
+async def compute_wasserstein_drift(payload: WassersteinDriftRequest) -> WassersteinDriftResponse:
+    """Calculate 1-Wasserstein distribution drift."""
+    w1, drifted, classification = WassersteinDriftEvaluator.compute_w1_distance(
+        payload.baseline_scores,
+        payload.current_scores,
+    )
+    return WassersteinDriftResponse(
+        w1_distance=w1,
+        is_drifted=drifted,
         classification=classification,
     )

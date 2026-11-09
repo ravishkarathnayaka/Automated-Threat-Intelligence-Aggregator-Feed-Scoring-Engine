@@ -24,11 +24,18 @@ from cti_core.processors.ja4_fingerprint_processor import JA4FingerprintProcesso
 from cti_core.processors.ja4s_fingerprint_processor import JA4SFingerprintProcessor
 from cti_core.processors.beacon_jitter_analyzer import BeaconJitterAnalyzer
 from cti_core.processors.doh_anomaly_detector import DNSOverHTTPSDetector
+from cti_core.processors.ja4h_http_processor import JA4HFingerprintProcessor
+from cti_core.processors.ja4t_tcp_processor import JA4TTCPProcessor
+from cti_core.processors.dns_tunneling_detector import DNSTunnelingDetector
+from cti_core.processors.bgp_rpki_validator import BGPRPKIValidator
 from cti_core.processors.normalizer import defang, identify_indicator_type, refang
 from cti_core.processors.punycode import PunycodeProcessor
 from cti_core.scoring.bayesian_scorer import BayesianScorer
 from cti_core.scoring.beta_distribution_scorer import BetaDistributionScorer
 from cti_core.scoring.dirichlet_multinomial_scorer import DirichletMultinomialScorer
+from cti_core.scoring.dempster_shafer_scorer import DempsterShaferScorer
+from cti_core.scoring.hawkes_process_intensity import HawkesProcessIntensityModel
+from cti_core.scoring.cusum_changepoint_detector import CUSUMChangePointDetector
 from cti_core.scoring.kalman_confidence_filter import KalmanConfidenceFilter
 from cti_core.scoring.markov_threat_state import MarkovThreatStateModel, ThreatState
 from cti_core.scoring.pagerank_threat_graph import PageRankThreatGraph

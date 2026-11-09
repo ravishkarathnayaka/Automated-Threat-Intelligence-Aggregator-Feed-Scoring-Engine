@@ -26,10 +26,26 @@ from cti_core.collectors.urlhaus import URLhausCollector
 from cti_core.collectors.urlscan import URLScanCollector
 from cti_core.collectors.viriback_tracker_collector import ViriBackTrackerCollector
 from cti_core.collectors.vxvault import VXVaultCollector
+from cti_core.collectors.botvrij_collector import BotvrijCollector
+from cti_core.collectors.emerging_threats_collector import EmergingThreatsCollector
+from cti_core.collectors.phishstats_collector import PhishStatsCollector
+from cti_core.collectors.malwaredomainlist_collector import MalwareDomainListCollector
+from cti_core.collectors.montysecurity_c2_collector import MontySecurityC2Collector
+from cti_core.collectors.ransomware_live_collector import RansomwareLiveCollector
+from cti_core.collectors.dshield_scanner_collector import DShieldScannerCollector
+from cti_core.collectors.bruteforceblocker_collector import BruteForceBlockerCollector
 
 __all__ = [
     "BaseCollector",
     "BambenekC2Collector",
+    "BotvrijCollector",
+    "BruteForceBlockerCollector",
+    "DShieldScannerCollector",
+    "EmergingThreatsCollector",
+    "MalwareDomainListCollector",
+    "MontySecurityC2Collector",
+    "PhishStatsCollector",
+    "RansomwareLiveCollector",
     "AbuseIPDBCollector",
     "BlocklistDeCollector",
     "CINSArmyCollector",

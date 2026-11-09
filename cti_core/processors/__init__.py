@@ -32,6 +32,13 @@ from cti_core.processors.user_agent_parser import UserAgentValidator
 from cti_core.processors.user_agent_anomaly_detector import UserAgentAnomalyDetector
 from cti_core.processors.whitelist_filter import WhitelistFilter
 from cti_core.processors.whois_registrar_classifier import RegistrarClassifier
+from cti_core.processors.ja4h_http_processor import JA4HFingerprintProcessor
+from cti_core.processors.ja4l_latency_processor import JA4LLatencyProcessor
+from cti_core.processors.ja4t_tcp_processor import JA4TTCPProcessor
+from cti_core.processors.dns_tunneling_detector import DNSTunnelingDetector
+from cti_core.processors.fast_flux_dns_detector import FastFluxDNSDetector
+from cti_core.processors.bgp_rpki_validator import BGPRPKIValidator
+from cti_core.processors.pe_imphash_processor import PEImphashProcessor
 
 __all__ = [
     "refang",
@@ -40,9 +47,12 @@ __all__ = [
     "normalize_indicator",
     "ASNReputationProcessor",
     "ASNPeerEvaluator",
+    "BGPRPKIValidator",
     "CertificateSerialNormalizer",
     "Deduplicator",
+    "DNSTunnelingDetector",
     "EmailSanitizer",
+    "FastFluxDNSDetector",
     "FaviconHashCalculator",
     "DGADetector",
     "DGANgramClassifier",
@@ -62,6 +72,10 @@ __all__ = [
     "UserAgentAnomalyDetector",
     "HashValidator",
     "JA4FingerprintProcessor",
+    "JA4HFingerprintProcessor",
+    "JA4LLatencyProcessor",
+    "JA4TTCPProcessor",
+    "PEImphashProcessor",
     "IPv6Normalizer",
     "MACNormalizer",
     "MitreMapper",

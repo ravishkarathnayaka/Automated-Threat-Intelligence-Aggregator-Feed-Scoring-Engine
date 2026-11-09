@@ -902,7 +902,11 @@ function downloadExport(format) {
     k8s: "yaml",
     istio: "yaml",
     cilium: "yaml",
-    okta: "json"
+    okta: "json",
+    netskope: "json",
+    zscaler: "json",
+    cloudarmor: "json",
+    calico: "yaml"
   };
   const ext = extMap[format] || "txt";
   const filename = `threat_intel_${format}.${ext}`;

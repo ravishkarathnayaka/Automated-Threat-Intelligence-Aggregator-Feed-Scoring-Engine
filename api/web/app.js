@@ -906,7 +906,10 @@ function downloadExport(format) {
     netskope: "json",
     zscaler: "json",
     cloudarmor: "json",
-    calico: "yaml"
+    calico: "yaml",
+    traefik: "yaml",
+    "azure-front-door": "json",
+    auth0: "js"
   };
   const ext = extMap[format] || "txt";
   const filename = `threat_intel_${format}.${ext}`;

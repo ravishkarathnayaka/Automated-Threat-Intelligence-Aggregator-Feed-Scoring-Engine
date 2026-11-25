@@ -28,6 +28,10 @@ from cti_core.processors.ja4h_http_processor import JA4HFingerprintProcessor
 from cti_core.processors.ja4t_tcp_processor import JA4TTCPProcessor
 from cti_core.processors.dns_tunneling_detector import DNSTunnelingDetector
 from cti_core.processors.bgp_rpki_validator import BGPRPKIValidator
+from cti_core.processors.tls_ja4ssh_fingerprint_processor import JA4SSHFingerprintProcessor
+from cti_core.processors.tls_sni_proxy_domain_fronting_detector import DomainFrontingDetector
+from cti_core.processors.subdomain_takeover_risk_processor import SubdomainTakeoverProcessor
+from cti_core.scoring.markov_decision_threat_mitigation import ThreatMitigationMDP
 from cti_core.processors.normalizer import defang, identify_indicator_type, refang
 from cti_core.processors.punycode import PunycodeProcessor
 from cti_core.scoring.bayesian_scorer import BayesianScorer
@@ -195,6 +199,25 @@ def build_parser() -> argparse.ArgumentParser:
     doh_p = subparsers.add_parser("doh", help="Evaluate indicator for DNS-over-HTTPS/TLS egress evasion")
     doh_p.add_argument("indicator", type=str, help="Domain or IP address")
     doh_p.add_argument("--type", type=str, default="domain", choices=["domain", "ipv4", "ipv6"], help="Indicator type")
+
+    # Command: ja4ssh
+    ja4ssh_p = subparsers.add_parser("ja4ssh", help="Evaluate Fox-IT JA4SSH SSH tunnel fingerprint")
+    ja4ssh_p.add_argument("fingerprint", type=str, help="JA4SSH string (e.g. c_1_0_0_0)")
+
+    # Command: domain-fronting
+    front_p = subparsers.add_parser("domain-fronting", help="Evaluate TLS SNI vs HTTP Host domain-fronting evasion")
+    front_p.add_argument("sni", type=str, help="Server Name Indication (SNI)")
+    front_p.add_argument("host", type=str, help="HTTP inner Host header")
+
+    # Command: subdomain-takeover
+    takeover_p = subparsers.add_parser("subdomain-takeover", help="Evaluate CNAME target for dangling subdomain takeover")
+    takeover_p.add_argument("cname", type=str, help="CNAME target (e.g. site.github.io)")
+    takeover_p.add_argument("--body", type=str, default=None, help="HTTP response body snippet")
+
+    # Command: mdp-mitigate
+    mdp_p = subparsers.add_parser("mdp-mitigate", help="Compute MDP optimal response action for threat confidence")
+    mdp_p.add_argument("score", type=float, help="Threat confidence score (0-100)")
+    mdp_p.add_argument("--impact", type=float, default=1.0, help="Business impact weight (default 1.0)")
     return parser
 
 
@@ -615,6 +638,46 @@ def main(args: Optional[List[str]] = None) -> int:
             "description": desc,
         }
         print(json.dumps(out, indent=2))
+        return 0
+
+    elif parsed.command == "ja4ssh":
+        is_valid = JA4SSHFingerprintProcessor.is_valid_ja4ssh(parsed.fingerprint)
+        penalty, desc = JA4SSHFingerprintProcessor.evaluate(parsed.fingerprint)
+        out = {
+            "fingerprint": parsed.fingerprint,
+            "is_valid": is_valid,
+            "penalty_score": penalty,
+            "classification": desc,
+        }
+        print(json.dumps(out, indent=2))
+        return 0
+
+    elif parsed.command == "domain-fronting":
+        is_fronting, penalty, desc = DomainFrontingDetector.evaluate(parsed.sni, parsed.host)
+        out = {
+            "tls_sni": parsed.sni,
+            "http_host": parsed.host,
+            "is_fronting": is_fronting,
+            "risk_penalty": penalty,
+            "description": desc,
+        }
+        print(json.dumps(out, indent=2))
+        return 0
+
+    elif parsed.command == "subdomain-takeover":
+        is_vuln, penalty, desc = SubdomainTakeoverProcessor.evaluate(parsed.cname, parsed.body)
+        out = {
+            "cname_target": parsed.cname,
+            "is_takeover_vulnerable": is_vuln,
+            "risk_penalty": penalty,
+            "description": desc,
+        }
+        print(json.dumps(out, indent=2))
+        return 0
+
+    elif parsed.command == "mdp-mitigate":
+        res = ThreatMitigationMDP.evaluate_optimal_action(parsed.score, business_impact_weight=parsed.impact)
+        print(json.dumps(res, indent=2))
         return 0
 
     return 0

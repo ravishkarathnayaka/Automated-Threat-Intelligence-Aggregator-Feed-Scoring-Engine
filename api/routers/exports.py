@@ -25,6 +25,9 @@ from cti_core.exporters.netskope_casb_exporter import NetskopeCASBExporter
 from cti_core.exporters.zscaler_zia_exporter import ZscalerZIAExporter
 from cti_core.exporters.google_cloud_armor_exporter import GoogleCloudArmorExporter
 from cti_core.exporters.calico_policy_exporter import CalicoPolicyExporter
+from cti_core.exporters.traefik_middleware_exporter import TraefikMiddlewareExporter
+from cti_core.exporters.azure_front_door_waf_exporter import AzureFrontDoorWAFExporter
+from cti_core.exporters.auth0_action_threat_guard_exporter import Auth0ActionThreatGuardExporter
 from cti_core.exporters.k8s_network_policy_exporter import K8sNetworkPolicyExporter
 from cti_core.exporters.microsoft_sentinel_exporter import MicrosoftSentinelExporter
 from cti_core.exporters.misp_exporter import MISPExporter
@@ -1089,4 +1092,96 @@ async def export_calico_policy(
         content=content,
         media_type="text/yaml; charset=utf-8",
         headers={"Content-Disposition": 'inline; filename="calico_global_policy.yaml"'},
+    )
+
+@router.get(
+    "/traefik-middleware.yaml",
+    response_class=Response,
+    summary="Export Traefik IngressRoute Middleware YAML",
+    description="Traefik v1alpha1 Middleware manifest with IP blocklist plugin configuration.",
+)
+async def export_traefik_middleware(
+    min_score: float = Query(75.0, ge=0.0, le=100.0, description="Minimum confidence score threshold"),
+    namespace: str = Query("traefik-system", description="Traefik namespace"),
+    session: AsyncSession = Depends(get_db_session),
+) -> Response:
+    """Stream Traefik Middleware YAML manifest."""
+    stmt = (
+        select(IndicatorModel)
+        .where(
+            IndicatorModel.is_whitelisted.is_(False),
+            IndicatorModel.confidence_score >= min_score,
+        )
+        .order_by(IndicatorModel.confidence_score.desc())
+    )
+    result = await session.execute(stmt)
+    indicators = result.scalars().all()
+
+    content = TraefikMiddlewareExporter.export_yaml_manifest(indicators, namespace=namespace, min_score=min_score)
+    return Response(
+        content=content,
+        media_type="text/yaml; charset=utf-8",
+        headers={"Content-Disposition": 'inline; filename="traefik_middleware.yaml"'},
+    )
+
+
+@router.get(
+    "/azure-front-door.json",
+    response_class=Response,
+    summary="Export Azure Front Door (AFD) WAF Custom Rules JSON",
+    description="Azure Front Door WAF custom IP Match rule policy payload.",
+)
+async def export_azure_front_door(
+    min_score: float = Query(75.0, ge=0.0, le=100.0, description="Minimum confidence score threshold"),
+    policy_name: str = Query("SentinelFrontDoorWAFPolicy", description="Azure Front Door WAF policy name"),
+    session: AsyncSession = Depends(get_db_session),
+) -> Response:
+    """Stream Azure Front Door WAF custom rules JSON payload."""
+    stmt = (
+        select(IndicatorModel)
+        .where(
+            IndicatorModel.is_whitelisted.is_(False),
+            IndicatorModel.confidence_score >= min_score,
+        )
+        .order_by(IndicatorModel.confidence_score.desc())
+    )
+    result = await session.execute(stmt)
+    indicators = result.scalars().all()
+
+    content = AzureFrontDoorWAFExporter.export_waf_rules_json(indicators, policy_name=policy_name, min_score=min_score)
+    return Response(
+        content=content,
+        media_type="application/json; charset=utf-8",
+        headers={"Content-Disposition": 'inline; filename="azure_front_door_waf.json"'},
+    )
+
+
+@router.get(
+    "/auth0-action.js",
+    response_class=Response,
+    summary="Export Auth0 Post-Login Action JavaScript",
+    description="Auth0 Post-Login Actions code snippet enforcing IP threat blocklist.",
+)
+async def export_auth0_action(
+    min_score: float = Query(75.0, ge=0.0, le=100.0, description="Minimum confidence score threshold"),
+    action_name: str = Query("sentinel-threat-guard-action", description="Auth0 action name"),
+    session: AsyncSession = Depends(get_db_session),
+) -> Response:
+    """Stream Auth0 Post-Login Action JavaScript."""
+    stmt = (
+        select(IndicatorModel)
+        .where(
+            IndicatorModel.is_whitelisted.is_(False),
+            IndicatorModel.confidence_score >= min_score,
+        )
+        .order_by(IndicatorModel.confidence_score.desc())
+    )
+    result = await session.execute(stmt)
+    indicators = result.scalars().all()
+
+    content = Auth0ActionThreatGuardExporter.export_action_javascript(indicators, action_name=action_name, min_score=min_score)
+    return Response(
+        content=content,
+        media_type="application/javascript; charset=utf-8",
+        headers={"Content-Disposition": 'inline; filename="auth0_action.js"'},
     )

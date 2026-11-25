@@ -23,6 +23,8 @@ from cti_core.scoring.thompson_sampling_bandit import ThompsonSamplingBandit
 from cti_core.scoring.brier_score_calibrator import BrierScoreCalibrator
 from cti_core.scoring.hawkes_process_intensity import HawkesProcessIntensityModel
 from cti_core.scoring.bhattacharyya_distance_scorer import BhattacharyyaDistanceScorer
+from cti_core.scoring.shannon_entropy_anomaly_scorer import EntropyCompressionScorer
+from cti_core.scoring.markov_decision_threat_mitigation import ThreatMitigationMDP
 
 __all__ = [
     "BayesianScorer",
@@ -30,9 +32,11 @@ __all__ = [
     "BrierScoreCalibrator",
     "CUSUMChangePointDetector",
     "DempsterShaferScorer",
+    "EntropyCompressionScorer",
     "HawkesProcessIntensityModel",
     "ScoringEngine",
     "ThompsonSamplingBandit",
+    "ThreatMitigationMDP",
     "WassersteinDriftEvaluator",
     "global_scoring_engine",
     "ConsensusScorer",

@@ -37,8 +37,13 @@ from cti_core.exporters.aws_wafv2_exporter import AWSWAFv2Exporter
 from cti_core.exporters.calico_policy_exporter import CalicoPolicyExporter
 from cti_core.exporters.kong_gateway_exporter import KongGatewayExporter
 from cti_core.exporters.datadog_siem_exporter import DatadogSIEMExporter
+from cti_core.exporters.traefik_middleware_exporter import TraefikMiddlewareExporter
+from cti_core.exporters.azure_front_door_waf_exporter import AzureFrontDoorWAFExporter
+from cti_core.exporters.auth0_action_threat_guard_exporter import Auth0ActionThreatGuardExporter
 
 __all__ = [
+    "Auth0ActionThreatGuardExporter",
+    "AzureFrontDoorWAFExporter",
     "AWSNetworkFirewallExporter",
     "AWSWAFv2Exporter",
     "AzureFirewallExporter",

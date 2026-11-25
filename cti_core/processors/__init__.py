@@ -39,6 +39,9 @@ from cti_core.processors.dns_tunneling_detector import DNSTunnelingDetector
 from cti_core.processors.fast_flux_dns_detector import FastFluxDNSDetector
 from cti_core.processors.bgp_rpki_validator import BGPRPKIValidator
 from cti_core.processors.pe_imphash_processor import PEImphashProcessor
+from cti_core.processors.tls_ja4ssh_fingerprint_processor import JA4SSHFingerprintProcessor
+from cti_core.processors.tls_sni_proxy_domain_fronting_detector import DomainFrontingDetector
+from cti_core.processors.subdomain_takeover_risk_processor import SubdomainTakeoverProcessor
 
 __all__ = [
     "refang",
@@ -48,6 +51,9 @@ __all__ = [
     "ASNReputationProcessor",
     "ASNPeerEvaluator",
     "BGPRPKIValidator",
+    "DomainFrontingDetector",
+    "JA4SSHFingerprintProcessor",
+    "SubdomainTakeoverProcessor",
     "CertificateSerialNormalizer",
     "Deduplicator",
     "DNSTunnelingDetector",

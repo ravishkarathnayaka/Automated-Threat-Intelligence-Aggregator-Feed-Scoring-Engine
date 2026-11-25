@@ -34,18 +34,24 @@ from cti_core.collectors.montysecurity_c2_collector import MontySecurityC2Collec
 from cti_core.collectors.ransomware_live_collector import RansomwareLiveCollector
 from cti_core.collectors.dshield_scanner_collector import DShieldScannerCollector
 from cti_core.collectors.bruteforceblocker_collector import BruteForceBlockerCollector
+from cti_core.collectors.curated_intel_collector import CuratedIntelCollector
+from cti_core.collectors.threat_fox_asn_collector import ThreatFoxASNCollector
+from cti_core.collectors.maltiverse_ioc_collector import MaltiverseIOCCollector
 
 __all__ = [
     "BaseCollector",
     "BambenekC2Collector",
     "BotvrijCollector",
     "BruteForceBlockerCollector",
+    "CuratedIntelCollector",
     "DShieldScannerCollector",
     "EmergingThreatsCollector",
     "MalwareDomainListCollector",
+    "MaltiverseIOCCollector",
     "MontySecurityC2Collector",
     "PhishStatsCollector",
     "RansomwareLiveCollector",
+    "ThreatFoxASNCollector",
     "AbuseIPDBCollector",
     "BlocklistDeCollector",
     "CINSArmyCollector",

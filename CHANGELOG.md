@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [4.5.0] - 2026-11-25
+
+### Added
+- **Cloud Gateways, WAF & IAM Post-Login Enforcement Exporters**:
+  - TraefikMiddlewareExporter: Traefik Kubernetes Ingress Middleware CRD generator (/api/v1/export/traefik-middleware.yaml).
+  - AzureFrontDoorWAFExporter: Microsoft Azure Front Door and CDN WAF policy custom rule exporter (/api/v1/export/azure-front-door.json).
+  - Auth0ActionThreatGuardExporter: Auth0 Post-Login Action Node.js script exporter (/api/v1/export/auth0-action.js).
+
+- **Next-Gen Curated & Commercial Telemetry Collectors**:
+  - CuratedIntelCollector: High-confidence curated IR and commercial threat feed aggregator.
+  - ThreatFoxASNCollector: abused.ch ThreatFox ASN infrastructure collector.
+  - MaltiverseIOCCollector: Maltiverse OSINT multi-threat intelligence collector.
+
+- **Advanced Protocol & Evasion Analyzers**:
+  - JA4SSHFingerprintProcessor: Fox-IT JA4SSH interactive SSH tunnel and brute-force profiler.
+  - DomainFrontingDetector: TLS SNI vs HTTP Host header CDN domain-fronting detector.
+  - SubdomainTakeoverProcessor: Dangling CNAME cloud provider abandonment vulnerability analyzer.
+
+- **Stochastic Scoring & Mitigation Engines**:
+  - EntropyCompressionScorer: Shannon entropy and Deflate compression ratio anomaly scorer.
+  - ThreatMitigationMDP: Markov Decision Process (MDP) automated incident response action engine.
+
+- **CLI Commands & Web Portal Updates**:
+  - Added CLI subcommands ja4ssh, domain-fronting, subdomain-takeover, and mdp-mitigate.
+  - Added Traefik, Azure Front Door, and Auth0 export cards with interactive client-side preview generation.
+
+---
 ## [4.0.0] - 2026-11-09
 
 ### Added
